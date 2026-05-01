@@ -1,0 +1,295 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = "MedUZI — Zamonaviy Ultratovush Diagnostika Markazi";
+    var dbNews = (IEnumerable<NewsArticleDto>)ViewBag.News;
+    var dbServices = (IEnumerable<ServiceItemDto>)ViewBag.Services;
+    var dbDoctors = (IEnumerable<DoctorProfileDto>)ViewBag.Doctors;
+}
+
+@functions {
+    static bool IsDirectVideo(string url) =>
+        url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
+        url.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ||
+        url.StartsWith("/uploads", StringComparison.OrdinalIgnoreCase);
+}
+
+@* ========== NAVBAR ========== *@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top site-nav" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <span class="brand-icon">🏥</span> MedUZI Diagnostika
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav ms-auto me-3">
+                <li class="nav-item"><a class="nav-link" href="#xizmatlar">Xizmatlar</a></li>
+                <li class="nav-item"><a class="nav-link" href="#biz-haqimizda">Biz haqimizda</a></li>
+                <li class="nav-item"><a class="nav-link" href="#shifokorlar">Shifokorlar</a></li>
+                <li class="nav-item"><a class="nav-link" href="#yangiliklar">Yangiliklar</a></li>
+                <li class="nav-item"><a class="nav-link" href="#aloqa">Aloqa</a></li>
+            </ul>
+            <a href="/Auth/Login" class="btn btn-outline-light btn-sm px-3">🔐 Tizimga kirish</a>
+        </div>
+    </div>
+</nav>
+
+@* ========== HERO ========== *@
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-7">
+                <span class="badge bg-primary bg-opacity-75 mb-3 px-3 py-2">✨ Zamonaviy texnologiyalar</span>
+                <h1 class="hero-title">
+                    Professional<br />
+                    <span class="text-primary-gradient">Ultratovush Diagnostikasi</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Yuqori aniqlikdagi UZI apparatlari. Tajribali shifokorlar jamoasi.
+                    Tez va ishonchli natijalar — sizning sog'lig'ingiz bizning ustuvor vazifamiz.
+                </p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="#aloqa" class="btn btn-primary btn-lg px-4">📞 Qabulga yozilish</a>
+                    <a href="#xizmatlar" class="btn btn-outline-light btn-lg px-4">Xizmatlar →</a>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-4 hero-stat-item"><h3 class="fw-bold mb-0">15+</h3><small class="text-white-50">Yillik tajriba</small></div>
+                    <div class="col-4 hero-stat-item"><h3 class="fw-bold mb-0">50 000+</h3><small class="text-white-50">Tekshiruvlar</small></div>
+                    <div class="col-4 hero-stat-item"><h3 class="fw-bold mb-0">20+</h3><small class="text-white-50">Shifokorlar</small></div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-medical-card">
+                    <span class="hero-medical-icon">🩺</span>
+                    <h4 class="fw-bold">UZI Diagnostika</h4>
+                    <p class="text-white-50 small mb-0">Yuqori aniqlikdagi 3D/4D tasvirlash texnologiyasi</p>
+                    <div class="hero-feature-pills">
+                        <span class="hero-pill">🫁 Qorin bo'shlig'i</span>
+                        <span class="hero-pill">❤️ Yurak</span>
+                        <span class="hero-pill">🤰 Homiladorlik</span>
+                        <span class="hero-pill">🦴 Bo'g'imlar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ========== XIZMATLAR ========== *@
+<section id="xizmatlar" class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">🩺 Bizning xizmatlar</span>
+            <h2 class="section-title">UZI Diagnostika Xizmatlari</h2>
+            <p class="section-subtitle">Eng zamonaviy ultratovush apparatlari yordamida to'liq va ishonchli diagnostika</p>
+        </div>
+        <div class="row g-4">
+            @if (dbServices != null && dbServices.Any())
+            {
+                @foreach (var s in dbServices.OrderBy(x => x.SortOrder))
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card service-card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="service-icon mb-3">@s.Icon</div>
+                                <h5 class="fw-bold">@s.Name</h5>
+                                <p class="text-muted small">@s.Description</p>
+                                @if (s.Price.HasValue)
+                                {
+                                    <span class="service-price">@s.Price.Value.ToString("N0") so'm</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-6 col-lg-3"><div class="card service-card h-100 border-0 shadow-sm"><div class="card-body text-center p-4"><div class="service-icon mb-3">🫁</div><h5 class="fw-bold">Qorin bo'shlig'i</h5><p class="text-muted small">Jigar, o't pufagi, oshqozon osti bezi, taloq va buyraklarni to'liq tekshirish</p></div></div></div>
+                <div class="col-md-6 col-lg-3"><div class="card service-card h-100 border-0 shadow-sm"><div class="card-body text-center p-4"><div class="service-icon mb-3">❤️</div><h5 class="fw-bold">Yurak UZI</h5><p class="text-muted small">Exokardiografiya — yurak tuzilishi va ishlashini baholash</p></div></div></div>
+                <div class="col-md-6 col-lg-3"><div class="card service-card h-100 border-0 shadow-sm"><div class="card-body text-center p-4"><div class="service-icon mb-3">🤰</div><h5 class="fw-bold">Homiladorlik UZI</h5><p class="text-muted small">Homilaning rivojlanishini kuzatish, 3D/4D tasvirlar</p></div></div></div>
+                <div class="col-md-6 col-lg-3"><div class="card service-card h-100 border-0 shadow-sm"><div class="card-body text-center p-4"><div class="service-icon mb-3">🦴</div><h5 class="fw-bold">Bo'g'im va mushaklar</h5><p class="text-muted small">Bo'g'imlar, paylar va yumshoq to'qimalarni UZI tekshiruvi</p></div></div></div>
+            }
+        </div>
+    </div>
+</section>
+
+@* ========== BIZ HAQIMIZDA ========== *@
+<section id="biz-haqimizda" class="py-5" style="background:linear-gradient(180deg,#f8fafc,#f1f5f9);">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="section-badge">🏥 Biz haqimizda</span>
+                <h2 class="section-title mb-3">MedUZI Diagnostika Markazi</h2>
+                <p class="text-muted" style="line-height:1.8;">MedUZI — O'zbekistondagi yetakchi ultratovush diagnostika markazlaridan biri. 2010-yildan buyon biz minglab bemorlarning sog'lig'ini tiklashga yordam bermoqdamiz.</p>
+                <p class="text-muted" style="line-height:1.8;">Markazimizda eng so'nggi avlod ultratovush apparatlari o'rnatilgan. Barcha shifokorlarimiz xalqaro sertifikatlarga ega.</p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6"><div class="about-feature-item"><div class="about-feature-icon">✅</div><span class="fw-medium">Xalqaro standartlar</span></div></div>
+                    <div class="col-6"><div class="about-feature-item"><div class="about-feature-icon">🕐</div><span class="fw-medium">24/7 qabulxona</span></div></div>
+                    <div class="col-6"><div class="about-feature-item"><div class="about-feature-icon">🔬</div><span class="fw-medium">Zamonaviy uskunalar</span></div></div>
+                    <div class="col-6"><div class="about-feature-item"><div class="about-feature-icon">💰</div><span class="fw-medium">Qulay narxlar</span></div></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-stats-grid">
+                    <div class="stat-card text-center p-4 rounded-4 bg-white shadow-sm"><h2 class="fw-bold text-primary mb-1">15+</h2><small class="text-muted">Yillik tajriba</small></div>
+                    <div class="stat-card text-center p-4 rounded-4 bg-white shadow-sm"><h2 class="fw-bold text-success mb-1">50 000+</h2><small class="text-muted">Tekshiruvlar</small></div>
+                    <div class="stat-card text-center p-4 rounded-4 bg-white shadow-sm"><h2 class="fw-bold text-info mb-1">20+</h2><small class="text-muted">Shifokorlar</small></div>
+                    <div class="stat-card text-center p-4 rounded-4 bg-white shadow-sm"><h2 class="fw-bold text-warning mb-1">99%</h2><small class="text-muted">Mijozlar mamnunligi</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ========== CTA ========== *@
+<section class="cta-banner py-5 text-white text-center">
+    <div class="container py-4">
+        <h2 class="fw-bold mb-3" style="font-size:2rem;">🩺 Sog'lig'ingiz haqida qayg'urasizmi?</h2>
+        <p class="text-white-50 mb-4 mx-auto" style="max-width:500px;">Bugun qabulga yoziling va professional UZI tekshiruvidan o'ting</p>
+        <a href="#aloqa" class="btn btn-light btn-lg px-5 fw-semibold">📞 Hoziroq qo'ng'iroq qiling</a>
+    </div>
+</section>
+
+@* ========== SHIFOKORLAR ========== *@
+<section id="shifokorlar" class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">👨‍⚕️ Jamoamiz</span>
+            <h2 class="section-title">Tajribali Shifokorlar</h2>
+            <p class="section-subtitle">Xalqaro sertifikatlarga ega, doimiy malaka oshiruvchi mutaxassislar</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            @if (dbDoctors != null && dbDoctors.Any())
+            {
+                @foreach (var d in dbDoctors.OrderBy(x => x.SortOrder))
+                {
+                    <div class="col-md-4">
+                        <div class="card doctor-card border-0 shadow-sm text-center p-4">
+                            <div class="doctor-avatar mx-auto mb-3">👨‍⚕️</div>
+                            <h5 class="fw-bold mb-1">@d.FullName</h5>
+                            <span class="doctor-specialty mb-2 d-inline-block">@d.Specialty</span>
+                            <p class="text-muted small mt-2 mb-0">@d.ExperienceYears yillik tajriba. @d.Bio</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-4"><div class="card doctor-card border-0 shadow-sm text-center p-4"><div class="doctor-avatar mx-auto mb-3">👨‍⚕️</div><h5 class="fw-bold mb-1">Dr. Karimov Jasur</h5><span class="doctor-specialty mb-2 d-inline-block">UZI mutaxassisi</span><p class="text-muted small mt-2 mb-0">12 yillik tajriba.</p></div></div>
+            }
+        </div>
+    </div>
+</section>
+
+@* ========== YANGILIKLAR ========== *@
+<section id="yangiliklar" class="py-5" style="background:linear-gradient(180deg,#f8fafc,#f1f5f9);">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">📰 Yangiliklar</span>
+            <h2 class="section-title">So'nggi yangiliklar</h2>
+            <p class="section-subtitle">Markazimiz faoliyati va tibbiyot yangiliklari haqida</p>
+        </div>
+        @if (dbNews != null && dbNews.Any())
+        {
+            <div class="row g-4">
+                @foreach (var n in dbNews.OrderByDescending(x => x.PublishedAt).Take(6))
+                {
+                    <div class="col-md-4">
+                        <div class="card news-card border-0 shadow-sm h-100">
+                            @if (!string.IsNullOrEmpty(n.ImageUrl))
+                            {
+                                <img src="@n.ImageUrl" class="card-img-top" style="height:200px;object-fit:cover;" alt="@n.Title" />
+                            }
+                            else if (!string.IsNullOrEmpty(n.VideoUrl))
+                            {
+                                @if (IsDirectVideo(n.VideoUrl))
+                                {
+                                    <video class="card-img-top" style="height:200px;object-fit:cover;" muted preload="metadata">
+                                        <source src="@n.VideoUrl" type="video/mp4" />
+                                    </video>
+                                }
+                                else
+                                {
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="@n.VideoUrl" allowfullscreen style="border:0;"></iframe>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div style="height:200px;background:linear-gradient(135deg,#e0f2fe,#ddd6fe);display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:3rem;">📰</span>
+                                </div>
+                            }
+                            <div class="card-body p-4">
+                                <span class="news-date">@n.PublishedAt?.ToString("dd.MM.yyyy")</span>
+                                <h5 class="fw-bold mt-2 mb-2">@n.Title</h5>
+                                <p class="text-muted small mb-0">@n.Summary</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center text-muted">
+                <div style="font-size:4rem;margin-bottom:1rem;">📰</div>
+                <p>Hozircha yangiliklar yo'q.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@* ========== ALOQA ========== *@
+<section id="aloqa" class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">📞 Bog'lanish</span>
+            <h2 class="section-title">Biz bilan bog'laning</h2>
+            <p class="section-subtitle">Savollaringiz bormi? Bizga qo'ng'iroq qiling yoki tashrif buyuring</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4"><div class="card contact-card border-0 shadow-sm text-center p-4 h-100"><div class="contact-icon mx-auto" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">📍</div><h5 class="fw-bold">Manzil</h5><p class="text-muted mb-0">Toshkent shahri, Chilonzor tumani,<br />Bunyodkor ko'chasi, 42-uy</p></div></div>
+            <div class="col-md-4"><div class="card contact-card border-0 shadow-sm text-center p-4 h-100"><div class="contact-icon mx-auto" style="background:linear-gradient(135deg,#dbeafe,#93c5fd);">📞</div><h5 class="fw-bold">Telefon</h5><p class="text-muted mb-0">+998 71 200-00-01<br />+998 90 123-45-67</p></div></div>
+            <div class="col-md-4"><div class="card contact-card border-0 shadow-sm text-center p-4 h-100"><div class="contact-icon mx-auto" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">🕐</div><h5 class="fw-bold">Ish vaqti</h5><p class="text-muted mb-0">Dushanba — Shanba: 08:00 — 20:00<br />Yakshanba: 09:00 — 15:00</p></div></div>
+        </div>
+    </div>
+</section>
+
+@* ========== FOOTER ========== *@
+<footer class="site-footer py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="fw-bold mb-3">🏥 MedUZI</h5>
+                <p class="text-white-50 small" style="line-height:1.8;">Zamonaviy ultratovush diagnostika markazi. 2010-yildan buyon sifatli tibbiy xizmat ko'rsatmoqdamiz.</p>
+            </div>
+            <div class="col-md-4">
+                <h6 class="fw-bold mb-3">Tezkor havolalar</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#xizmatlar" class="footer-link">🩺 Xizmatlar</a></li>
+                    <li class="mb-2"><a href="#shifokorlar" class="footer-link">👨‍⚕️ Shifokorlar</a></li>
+                    <li class="mb-2"><a href="#yangiliklar" class="footer-link">📰 Yangiliklar</a></li>
+                    <li class="mb-2"><a href="#aloqa" class="footer-link">📞 Aloqa</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="fw-bold mb-3">Ish vaqtlari</h6>
+                <p class="text-white-50 small mb-1">Dushanba — Shanba: 08:00 — 20:00</p>
+                <p class="text-white-50 small mb-3">Yakshanba: 09:00 — 15:00</p>
+                <a href="/Auth/Login" class="btn btn-outline-light btn-sm">🔐 Tizimga kirish</a>
+            </div>
+        </div>
+        <hr class="border-secondary my-4" />
+        <div class="text-center">
+            <span class="text-white-50 small">© 2025 MedUZI Diagnostika Markazi. Barcha huquqlar himoyalangan.</span>
+        </div>
+    </div>
+</footer>

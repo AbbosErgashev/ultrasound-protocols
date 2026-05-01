@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="UltrasoundProtocol.API/UltrasoundProtocol.API.csproj" />
+    <Project Path="UltrasoundProtocol.Application/UltrasoundProtocol.Application.csproj" />
+    <Project Path="UltrasoundProtocol.Domain/UltrasoundProtocol.Domain.csproj" />
+    <Project Path="UltrasoundProtocol.Infrastructure/UltrasoundProtocol.Infrastructure.csproj" />
+  </Folder>
+</Solution>

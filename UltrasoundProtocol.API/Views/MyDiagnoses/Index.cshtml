@@ -1,0 +1,38 @@
+@model IEnumerable<ProtocolDto>
+@{
+    ViewData["Title"] = "Mening tashxislarim";
+}
+
+@functions {
+    static string GetBadge(ProtocolStatus s) => s switch {
+        ProtocolStatus.Draft => "bg-secondary",
+        ProtocolStatus.Active => "bg-primary",
+        ProtocolStatus.Completed => "bg-success",
+        ProtocolStatus.Archived => "bg-dark",
+        _ => "bg-light text-dark"
+    };
+}
+
+<h3 class="mb-4">🩺 Mening UZI tekshiruvlarim</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Hozircha tekshiruvlar yo'q.</div>
+}
+else
+{
+    @foreach (var p in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><strong>@p.BodyPart</strong> — @p.ExamDate.ToString("dd.MM.yyyy")</span>
+                <span class="badge @GetBadge(p.Status)">@p.Status</span>
+            </div>
+            <div class="card-body">
+                <p><strong>Topilmalar:</strong> @p.Findings</p>
+                <p><strong>Xulosa:</strong> @p.Conclusion</p>
+                <p class="text-muted mb-0"><small>Shifokor: @p.DoctorUsername</small></p>
+            </div>
+        </div>
+    }
+}

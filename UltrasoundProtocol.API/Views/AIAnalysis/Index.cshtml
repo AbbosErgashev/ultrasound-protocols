@@ -1,0 +1,88 @@
+@{
+    ViewData["Title"] = "AI Tahlil";
+}
+
+<h3 class="mb-4">🤖 AI — UZI Tasvir Tahlili</h3>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold bg-primary text-white">📤 UZI tasvirni yuklash orqali tahlil</div>
+            <div class="card-body">
+                <form method="post" asp-controller="AIAnalysis" asp-action="AnalyzeImage" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tekshirilgan organ</label>
+                        <select name="bodyPart" class="form-select" required>
+                            <option value="">Tanlang...</option>
+                            <option>Qorin bo'shlig'i</option>
+                            <option>Jigar</option>
+                            <option>Buyrak</option>
+                            <option>O't pufagi</option>
+                            <option>Yurak</option>
+                            <option>Qalqonsimon bez</option>
+                            <option>Homiladorlik</option>
+                            <option>Bo'g'im va mushaklar</option>
+                            <option>Siydik pufagi</option>
+                            <option>Boshqa</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">UZI tasvir</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*" required />
+                        <small class="text-muted">JPG, PNG formatida, 10MB gacha</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Shifokor topilmalari (ixtiyoriy)</label>
+                        <textarea name="doctorFindings" class="form-control" rows="3"
+                                  placeholder="Agar oldindan topilmalar bo'lsa, yozing..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        🤖 Tasvirni AI bilan tahlil qilish
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold bg-secondary text-white">📝 Matnli tahlil</div>
+            <div class="card-body">
+                <form method="post" asp-controller="AIAnalysis" asp-action="AnalyzeText">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tekshirilgan organ</label>
+                        <select name="bodyPart" class="form-select" required>
+                            <option value="">Tanlang...</option>
+                            <option>Qorin bo'shlig'i</option>
+                            <option>Jigar</option>
+                            <option>Buyrak</option>
+                            <option>O't pufagi</option>
+                            <option>Yurak</option>
+                            <option>Qalqonsimon bez</option>
+                            <option>Homiladorlik</option>
+                            <option>Boshqa</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Topilmalar (Findings)</label>
+                        <textarea name="findings" class="form-control" rows="4"
+                                  placeholder="UZI topilmalarini kiriting..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary w-100">
+                        📝 Matn bo'yicha tahlil qilish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="fs-1 mb-3">🤖</div>
+                <h5 class="text-muted">AI tahlil natijasi shu yerda ko'rinadi</h5>
+                <p class="text-muted small">Chap tomonda forma to'ldiring va tahlil qilish tugmasini bosing</p>
+            </div>
+        </div>
+    </div>
+</div>

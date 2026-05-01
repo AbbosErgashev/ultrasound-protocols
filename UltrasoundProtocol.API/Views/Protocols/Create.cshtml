@@ -1,0 +1,77 @@
+@model ProtocolCreateDto
+@{
+    ViewData["Title"] = "Yangi protokol";
+    var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
+}
+
+<h3 class="mb-4">📝 Yangi UZI protokol yaratish</h3>
+
+<div class="card" style="max-width:700px;">
+    <div class="card-body">
+        <div class="mb-3 p-3 bg-light rounded">
+            <label class="form-label fw-semibold">📋 Shablondan to'ldirish (ixtiyoriy)</label>
+            <select id="templateSelect" class="form-select" onchange="applyTemplate(this.value)">
+                <option value="">Shablonsiz yozish...</option>
+                <option value="liver_normal" data-bodypart="Jigar" data-findings="Jigar o'lchamlari normal chegarada. O'ng bo'lak — 14.5 sm, chap bo'lak — 6.8 sm. Konturlari tekis, parenximasi bir xil, exogenizligi normal. Intragepatik o't yo'llari kengaymagan. Portal vena — 11 mm." data-conclusion="Jigar patologiyasi aniqlanmadi. Norma.">Jigar — Norma</option>
+                <option value="liver_fatty" data-bodypart="Jigar" data-findings="Jigar o'lchamlari kattalashgan. O'ng bo'lak — 17.2 sm. Parenxima exogenizligi diffuz oshgan, tomirlar ko'rinishi yomonlashgan. Jigar konturlari tekis, lekin tuzilishi heterogen." data-conclusion="Diffuz o'zgarishlar — yog'li gepatoz belgisi. Gastroenterolog konsultatsiyasi tavsiya etiladi.">Jigar — Yog'li gepatoz</option>
+                <option value="kidney_normal" data-bodypart="Buyrak" data-findings="O'ng buyrak — 10.5 x 4.8 sm, chap buyrak — 10.8 x 5.0 sm. Konturlari tekis, parenxima qalinligi 1.5-1.8 sm, exogenizligi normal. CLS kengaymagan. Konkrement aniqlanmadi." data-conclusion="Buyraklar patologiyasi aniqlanmadi. Norma.">Buyrak — Norma</option>
+                <option value="kidney_stone" data-bodypart="Buyrak" data-findings="O'ng buyrak CLS sohasida giperexogen tuzilma — 8 mm, akustik soya beradi. CLS 1-darajali kengayish. Parenxima qalinligi saqlangan." data-conclusion="O'ng buyrak nefrolitiazi. Urolog konsultatsiyasi tavsiya etiladi.">Buyrak — Tosh (Nefrolitiaz)</option>
+                <option value="gallbladder_normal" data-bodypart="O't pufagi" data-findings="O't pufagi o'lchamlari — 7.5 x 2.8 sm. Devori qalinligi — 2 mm. Ichida konkrement aniqlanmadi. Choledox — 5 mm." data-conclusion="O't pufagi patologiyasi aniqlanmadi. Norma.">O't pufagi — Norma</option>
+                <option value="gallbladder_stone" data-bodypart="O't pufagi" data-findings="O't pufagi devori qalinlashgan — 4 mm. Ichida 12 mm va 8 mm giperexogen tuzilmalar, akustik soya beradi. Choledox — 6 mm." data-conclusion="O't tosh kasalligi (Xolelityaz). Jarrohlik konsultatsiyasi tavsiya etiladi.">O't pufagi — Tosh</option>
+                <option value="thyroid_normal" data-bodypart="Qalqonsimon bez" data-findings="Qalqonsimon bez o'lchamlari: o'ng bo'lak — 1.8 x 1.6 x 4.5 sm, chap bo'lak — 1.7 x 1.5 x 4.3 sm. Isthmus — 3 mm. Parenxima bir xil, exogenizligi normal. Tugunlar aniqlanmadi." data-conclusion="Qalqonsimon bez patologiyasi aniqlanmadi. Norma.">Qalqonsimon bez — Norma</option>
+                <option value="bladder_normal" data-bodypart="Siydik pufagi" data-findings="Siydik pufagi to'la holatda tekshirildi. Devori tekis, qalinligi — 3 mm. Ichida patologik tuzilma aniqlanmadi. Qoldiq siydik — 15 ml." data-conclusion="Siydik pufagi patologiyasi aniqlanmadi.">Siydik pufagi — Norma</option>
+            </select>
+        </div>
+
+        <form method="post" asp-controller="Protocols" asp-action="Create">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label">Bemor</label>
+                <select name="PatientId" class="form-select" required>
+                    <option value="">Tanlang...</option>
+                    @foreach (var p in patients)
+                    {
+                        <option value="@p.Id">@p.FullName — @p.PhoneNumber</option>
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tekshirilgan organ</label>
+                <input id="bodyPartField" name="BodyPart" class="form-control"
+                       placeholder="masalan: Jigar, Buyrak, Qorin bo'shlig'i" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tekshiruv sanasi</label>
+                <input name="ExamDate" type="date" class="form-control"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Topilmalar (Findings)</label>
+                <textarea id="findingsField" name="Findings" class="form-control" rows="4"
+                          placeholder="UZI tekshiruvi natijalarini kiriting..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Xulosa (Conclusion)</label>
+                <textarea id="conclusionField" name="Conclusion" class="form-control" rows="3"
+                          placeholder="Yakuniy xulosa..."></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">💾 Saqlash</button>
+                <a href="/Protocols" class="btn btn-outline-secondary">Bekor qilish</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function applyTemplate(key) {
+    var sel = document.getElementById('templateSelect');
+    var opt = sel.options[sel.selectedIndex];
+    if (!key) return;
+    document.getElementById('bodyPartField').value = opt.dataset.bodypart || '';
+    document.getElementById('findingsField').value = opt.dataset.findings || '';
+    document.getElementById('conclusionField').value = opt.dataset.conclusion || '';
+}
+</script>
+}

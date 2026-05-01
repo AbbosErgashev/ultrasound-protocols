@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Bemor yaratildi";
+    var name = TempData["PatientName"]?.ToString();
+    var username = TempData["PatientUsername"]?.ToString();
+    var password = TempData["PatientPassword"]?.ToString();
+    var phone = TempData["PatientPhone"]?.ToString();
+}
+
+<div class="card border-success" style="max-width:550px;">
+    <div class="card-header bg-success text-white text-center py-3">
+        <h5 class="mb-0">✅ Bemor muvaffaqiyatli yaratildi!</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-3">Quyidagi login ma'lumotlarini bemorga yuboring:</p>
+        <div class="bg-light rounded-3 p-3 mb-3 border">
+            <table class="table table-borderless mb-0">
+                <tr><td class="fw-bold" style="width:120px;">Bemor:</td><td>@name</td></tr>
+                <tr><td class="fw-bold">Telefon:</td><td>@phone</td></tr>
+                <tr><td class="fw-bold">Login:</td><td><code class="fs-5">@username</code></td></tr>
+                <tr><td class="fw-bold">Parol:</td><td><code class="fs-5">@password</code></td></tr>
+            </table>
+        </div>
+        <div class="d-flex gap-2 mb-3">
+            <button class="btn btn-outline-primary flex-fill" onclick="copyCredentials()">📋 Nusxalash</button>
+            <button class="btn btn-outline-secondary flex-fill" onclick="exportCredentials()">📄 Eksport (.txt)</button>
+        </div>
+        <div id="copyAlert" class="alert alert-info py-2 text-center small d-none">✅ Nusxalandi!</div>
+        <hr />
+        <div class="d-flex gap-2">
+            <a href="/Patients" class="btn btn-outline-secondary flex-fill">👥 Bemorlar ro'yxati</a>
+            <a href="/Patients/Create" class="btn btn-success flex-fill">+ Yana qo'shish</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var credName = "@name", credUser = "@username", credPass = "@password", credPhone = "@phone";
+    function copyCredentials() {
+        var text = "MedUZI Diagnostika — Kirish ma'lumotlari\nBemor: " + credName +
+            "\nLogin: " + credUser + "\nParol: " + credPass;
+        navigator.clipboard.writeText(text).then(function() {
+            document.getElementById('copyAlert').classList.remove('d-none');
+        });
+    }
+    function exportCredentials() {
+        var text = "========================================\n  MedUZI Diagnostika Markazi\n  Tizimga kirish ma'lumotlari\n========================================\n\n" +
+            "Bemor:    " + credName + "\nTelefon:  " + credPhone + "\nLogin:    " + credUser + "\nParol:    " + credPass +
+            "\n\n========================================\nDiqqat: Ushbu ma'lumotlarni xavfsiz saqlang!\n========================================\n";
+        var blob = new Blob([text], {type: 'text/plain'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'MedUZI_Login_' + credUser + '.txt';
+        a.click();
+    }
+</script>
+}

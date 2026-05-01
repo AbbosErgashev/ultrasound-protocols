@@ -1,0 +1,83 @@
+@model DashboardDto
+@{
+    ViewData["Title"] = "Boshqaruv paneli";
+    var fullName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? User.Identity?.Name;
+}
+
+<h3 class="mb-2">📊 Boshqaruv paneli</h3>
+<p class="text-muted mb-4">Xush kelibsiz, <strong>@fullName</strong>!</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.TotalPatients</h2>
+                <small>Bemorlar</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-success h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.TotalProtocols</h2>
+                <small>Protokollar</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-info h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.ActiveProtocols</h2>
+                <small>Faol</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-secondary h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.CompletedProtocols</h2>
+                <small>Yakunlangan</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.TodayAppointments</h2>
+                <small>Bugungi randevular</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-danger h-100">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">@Model.UnreadNotifications</h2>
+                <small>Xabarlar</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.MonthlyStats.Count > 0)
+{
+    <div class="card">
+        <div class="card-header fw-semibold">📈 Oxirgi 6 oy statistikasi</div>
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Oy</th><th>Protokollar</th><th>Bemorlar</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var stat in Model.MonthlyStats)
+                    {
+                        <tr>
+                            <td>@stat.Month</td>
+                            <td>@stat.ProtocolCount</td>
+                            <td>@stat.PatientCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

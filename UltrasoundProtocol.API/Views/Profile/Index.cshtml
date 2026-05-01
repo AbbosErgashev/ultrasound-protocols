@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Mening profilim";
+    var userId = User.FindFirst("UserId")?.Value;
+}
+
+<h3 class="mb-4">👤 Mening profilim</h3>
+
+<div class="card" style="max-width:500px;">
+    <div class="card-body">
+        <div class="text-center mb-4">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto;">
+                👤
+            </div>
+        </div>
+        <table class="table table-borderless">
+            <tr><td class="fw-bold" style="width:40%">Ism:</td><td>@ViewBag.FullName</td></tr>
+            <tr><td class="fw-bold">Login:</td><td>@ViewBag.Username</td></tr>
+            <tr><td class="fw-bold">Rol:</td><td><span class="badge bg-primary">@ViewBag.Role</span></td></tr>
+            <tr>
+                <td class="fw-bold">User ID:</td>
+                <td>@(string.IsNullOrEmpty(userId) ? "Statik foydalanuvchi" : userId)</td>
+            </tr>
+        </table>
+        <hr />
+        <a href="/Auth/Logout" class="btn btn-outline-danger w-100">🚪 Tizimdan chiqish</a>
+    </div>
+</div>

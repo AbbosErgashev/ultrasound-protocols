@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — MedUZI</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/app.css" />
+    <style>
+        body { display: flex; min-height: 100vh; background: #f8fafc; }
+        .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg,#1e3a5f 0%,#2d5986 100%); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar-brand { padding: 1.2rem 1.5rem; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 0.6rem 1.5rem; border-radius: 0; transition: background 0.15s; display: flex; align-items: center; gap: 0.5rem; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); color: #fff; }
+        .sidebar .nav-section { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); padding: 1rem 1.5rem 0.3rem; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .page-body { flex: 1; padding: 1.5rem; overflow-y: auto; }
+        .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="sidebar">
+        <div class="sidebar-brand">🏥 MedUZI</div>
+        <nav class="nav flex-column pt-2">
+            <a class="nav-link" href="/Dashboard">📊 Boshqaruv paneli</a>
+
+            @if (User.IsInRole("Doctor") || User.IsInRole("SeniorDoctor") || User.IsInRole("ChiefDoctor"))
+            {
+                <div class="nav-section">Klinik</div>
+                <a class="nav-link" href="/Patients">👥 Bemorlar</a>
+                <a class="nav-link" href="/Protocols">📋 Protokollar</a>
+                <a class="nav-link" href="/Protocols/Create">➕ Yangi protokol</a>
+                <a class="nav-link" href="/AIAnalysis">🤖 AI Tahlil</a>
+                <a class="nav-link" href="/Appointments">📅 Randevular</a>
+            }
+
+            @if (User.IsInRole("User"))
+            {
+                <a class="nav-link" href="/MyDiagnoses">🩺 Mening tashxislarim</a>
+            }
+
+            @if (User.IsInRole("SeniorDoctor") || User.IsInRole("ChiefDoctor"))
+            {
+                <div class="nav-section">Hisobot</div>
+                <a class="nav-link" href="/Statistics">📈 Statistika</a>
+            }
+
+            @if (User.IsInRole("ChiefDoctor"))
+            {
+                <a class="nav-link" href="/AuditLogs">🔍 Audit loglar</a>
+            }
+
+            @if (User.IsInRole("ContentManager") || User.IsInRole("ChiefDoctor"))
+            {
+                <div class="nav-section">Kontent</div>
+                <a class="nav-link" href="/Manage/News">📰 Yangiliklar</a>
+                <a class="nav-link" href="/Manage/Services">🩺 Xizmatlar</a>
+                <a class="nav-link" href="/Manage/Doctors">👨‍⚕️ Shifokorlar</a>
+            }
+
+            <div class="nav-section">Hisob</div>
+            <a class="nav-link" href="/Profile">👤 Profil</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="topbar">
+            <span class="fw-semibold text-muted">@ViewData["Title"]</span>
+            <div class="d-flex align-items-center gap-3">
+                @{
+                    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+                    var roleColor = role switch {
+                        "ChiefDoctor" => "bg-danger",
+                        "SeniorDoctor" => "bg-warning text-dark",
+                        "Doctor" => "bg-primary",
+                        "ContentManager" => "bg-success",
+                        _ => "bg-secondary"
+                    };
+                }
+                <span class="badge @roleColor role-badge">@role</span>
+                <span class="text-dark fw-semibold small">@User.Identity!.Name</span>
+                <a href="/Auth/Logout" class="btn btn-sm btn-outline-danger">Chiqish</a>
+            </div>
+        </div>
+        <div class="page-body">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @RenderBody()
+        </div>
+    </div>
+}
+else
+{
+    @RenderBody()
+}
+
+<script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

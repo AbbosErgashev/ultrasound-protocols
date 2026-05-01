@@ -1,0 +1,42 @@
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Kirish";
+}
+
+<div class="card shadow-lg" style="width:420px; border:none; border-radius:16px;">
+    <div class="card-body p-5">
+        <div class="text-center mb-4">
+            <div style="font-size:3rem;">🏥</div>
+            <h4 class="fw-bold mt-2 mb-0">MedUZI Tizimi</h4>
+            <p class="text-muted small">UZI diagnostika boshqaruv tizimi</p>
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger py-2 small">@ViewBag.Error</div>
+        }
+        @if (ViewBag.Info != null)
+        {
+            <div class="alert alert-info py-2 small">@ViewBag.Info</div>
+        }
+
+        <form method="post" asp-controller="Auth" asp-action="Login">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Foydalanuvchi nomi</label>
+                <input name="Username" class="form-control form-control-lg" placeholder="username" required autofocus />
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Parol</label>
+                <input name="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+                🔐 Kirish
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="/" class="text-muted small">← Asosiy sahifaga qaytish</a>
+        </div>
+    </div>
+</div>

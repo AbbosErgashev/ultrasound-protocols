@@ -1,0 +1,132 @@
+@model IEnumerable<DoctorProfileDto>
+@{
+    ViewData["Title"] = "Shifokorlar boshqaruvi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>👨‍⚕️ Shifokorlar boshqaruvi</h3>
+    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createForm">+ Yangi shifokor</button>
+</div>
+
+<div class="collapse mb-4" id="createForm">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white fw-semibold">Yangi shifokor</div>
+        <div class="card-body">
+            <form method="post" asp-controller="Manage" asp-action="DoctorCreate">
+                @Html.AntiForgeryToken()
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">To'liq ism</label>
+                        <input name="FullName" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Mutaxassislik</label>
+                        <input name="Specialty" class="form-control" placeholder="UZI mutaxassisi" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tajriba (yil)</label>
+                        <input name="ExperienceYears" type="number" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Telefon</label>
+                        <input name="Phone" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tartib</label>
+                        <input name="SortOrder" type="number" class="form-control" value="0" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rasm URL</label>
+                        <input name="ImageUrl" class="form-control" placeholder="https://..." />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Biografiya</label>
+                        <textarea name="Bio" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">💾 Saqlash</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#createForm">Bekor qilish</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    @foreach (var d in Model)
+    {
+        <div class="col-md-4">
+            <div class="card h-100 @(!d.IsActive ? "opacity-50" : "")">
+                <div class="card-body text-center">
+                    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto;">
+                        👨‍⚕️
+                    </div>
+                    <h5 class="fw-bold mt-2 mb-0">@d.FullName</h5>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">@d.Specialty</span>
+                    <p class="text-muted small mt-2">@d.ExperienceYears yillik tajriba</p>
+                    <div class="d-flex gap-1 justify-content-center">
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal_@d.Id">✏️</button>
+                        <form method="post" asp-controller="Manage" asp-action="DoctorToggle" asp-route-id="@d.Id" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm @(d.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                @(d.IsActive ? "⏸️" : "▶️")
+                            </button>
+                        </form>
+                        <form method="post" asp-controller="Manage" asp-action="DoctorDelete" asp-route-id="@d.Id" class="d-inline"
+                              onsubmit="return confirm('O\'chirishni tasdiqlaysizmi?')">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editModal_@d.Id" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Tahrirlash</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" asp-controller="Manage" asp-action="DoctorEdit" asp-route-id="@d.Id">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">To'liq ism</label>
+                                    <input name="FullName" value="@d.FullName" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Mutaxassislik</label>
+                                    <input name="Specialty" value="@d.Specialty" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Tajriba (yil)</label>
+                                    <input name="ExperienceYears" type="number" value="@d.ExperienceYears" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Telefon</label>
+                                    <input name="Phone" value="@d.Phone" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Tartib</label>
+                                    <input name="SortOrder" type="number" value="@d.SortOrder" class="form-control" />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Biografiya</label>
+                                    <textarea name="Bio" class="form-control" rows="2">@d.Bio</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                            <button type="submit" class="btn btn-primary">💾 Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

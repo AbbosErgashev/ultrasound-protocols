@@ -1,0 +1,113 @@
+@model IEnumerable<PatientDto>
+@{
+    ViewData["Title"] = "Bemorlar ro'yxati";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>👥 Bemorlar ro'yxati</h3>
+    <div class="d-flex gap-2">
+        <a href="/Patients/ExportExcel" class="btn btn-success btn-sm">📊 Excel</a>
+        <a href="/Patients/Create" class="btn btn-primary">+ Yangi bemor</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Hozircha bemorlar yo'q.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ism</th>
+                        <th>Login</th>
+                        <th>Telefon</th>
+                        <th>Jins</th>
+                        <th>Tug'ilgan</th>
+                        <th>Holat</th>
+                        @if (User.IsInRole("ChiefDoctor"))
+                        {
+                            <th>🔐 Amallar</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td><strong>@p.FullName</strong></td>
+                            <td><code>@p.Username</code></td>
+                            <td>@p.PhoneNumber</td>
+                            <td>@p.Gender</td>
+                            <td>@p.DateOfBirth.ToString("dd.MM.yyyy")</td>
+                            <td>
+                                <span class="badge @(p.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(p.IsActive ? "Faol" : "Nofaol")
+                                </span>
+                            </td>
+                            @if (User.IsInRole("ChiefDoctor"))
+                            {
+                                <td>
+                                    <button class="btn btn-sm btn-outline-warning"
+                                            data-bs-toggle="modal" data-bs-target="#credModal"
+                                            data-pid="@p.Id"
+                                            data-pname="@p.FullName"
+                                            data-pusername="@p.Username">
+                                        🔑 Login/Parol
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (User.IsInRole("ChiefDoctor"))
+{
+    <div class="modal fade" id="credModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning bg-opacity-25">
+                    <h5 class="modal-title">🔐 Login/Parol o'zgartirish</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" asp-controller="Patients" asp-action="ChangeCredentials">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="credPatientId" />
+                    <div class="modal-body">
+                        <p>Bemor: <strong id="credPatientName"></strong></p>
+                        <div class="mb-3">
+                            <label class="form-label">Yangi Login</label>
+                            <input name="newUsername" id="credUsername" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Yangi Parol</label>
+                            <input name="newPassword" type="password" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+                        <button type="submit" class="btn btn-warning">💾 Saqlash</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('credModal')?.addEventListener('show.bs.modal', function (e) {
+            var btn = e.relatedTarget;
+            document.getElementById('credPatientId').value = btn.dataset.pid;
+            document.getElementById('credPatientName').textContent = btn.dataset.pname;
+            document.getElementById('credUsername').placeholder = 'Joriy: ' + btn.dataset.pusername;
+        });
+    </script>
+}

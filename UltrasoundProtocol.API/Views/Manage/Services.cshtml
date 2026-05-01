@@ -1,0 +1,122 @@
+@model IEnumerable<ServiceItemDto>
+@{
+    ViewData["Title"] = "Xizmatlar boshqaruvi";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>🩺 Xizmatlar boshqaruvi</h3>
+    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createForm">+ Yangi xizmat</button>
+</div>
+
+<div class="collapse mb-4" id="createForm">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white fw-semibold">Yangi xizmat</div>
+        <div class="card-body">
+            <form method="post" asp-controller="Manage" asp-action="ServiceCreate">
+                @Html.AntiForgeryToken()
+                <div class="row g-3">
+                    <div class="col-md-1">
+                        <label class="form-label">Icon</label>
+                        <input name="Icon" class="form-control text-center" style="font-size:1.5rem;" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Nomi</label>
+                        <input name="Name" class="form-control" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Narx (so'm)</label>
+                        <input name="Price" type="number" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tartib</label>
+                        <input name="SortOrder" type="number" class="form-control" value="0" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Tavsif</label>
+                        <textarea name="Description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">💾 Saqlash</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#createForm">Bekor qilish</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th></th><th>Nomi</th><th>Tavsif</th><th>Narx</th><th>Holat</th><th>Amallar</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td style="font-size:1.5rem;">@s.Icon</td>
+                        <td><strong>@s.Name</strong></td>
+                        <td class="text-muted small">@s.Description</td>
+                        <td>@(s.Price?.ToString("N0") ?? "—") so'm</td>
+                        <td><span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">@(s.IsActive ? "Faol" : "Nofaol")</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal_@s.Id">✏️</button>
+                            <form method="post" asp-controller="Manage" asp-action="ServiceToggle" asp-route-id="@s.Id" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm @(s.IsActive ? "btn-outline-warning" : "btn-outline-success") me-1">@(s.IsActive ? "⏸️" : "▶️")</button>
+                            </form>
+                            <form method="post" asp-controller="Manage" asp-action="ServiceDelete" asp-route-id="@s.Id" class="d-inline"
+                                  onsubmit="return confirm('O\'chirishni tasdiqlaysizmi?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="editModal_@s.Id" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Tahrirlash</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="post" asp-controller="Manage" asp-action="ServiceEdit" asp-route-id="@s.Id">
+                                    @Html.AntiForgeryToken()
+                                    <div class="modal-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <label class="form-label">Icon</label>
+                                                <input name="Icon" value="@s.Icon" class="form-control text-center" style="font-size:1.5rem;" />
+                                            </div>
+                                            <div class="col-md-10">
+                                                <label class="form-label">Nomi</label>
+                                                <input name="Name" value="@s.Name" class="form-control" required />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Narx (so'm)</label>
+                                                <input name="Price" type="number" value="@s.Price" class="form-control" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tartib</label>
+                                                <input name="SortOrder" type="number" value="@s.SortOrder" class="form-control" />
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Tavsif</label>
+                                                <textarea name="Description" class="form-control" rows="2">@s.Description</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                                        <button type="submit" class="btn btn-primary">💾 Saqlash</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

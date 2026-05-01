@@ -1,0 +1,41 @@
+@model IEnumerable<AuditLog>
+@{
+    ViewData["Title"] = "Audit loglar";
+}
+
+<h3 class="mb-4">🔍 Tizim audit loglari</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Hozircha loglar yo'q.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Vaqt</th>
+                        <th>Foydalanuvchi</th>
+                        <th>Amal</th>
+                        <th>Entity</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model)
+                    {
+                        <tr>
+                            <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@log.Username</td>
+                            <td>@log.Action</td>
+                            <td>@log.EntityName <small class="text-muted">@log.EntityId</small></td>
+                            <td>@(log.IpAddress ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,69 @@
+@model DashboardDto
+@{
+    ViewData["Title"] = "Klinika statistikasi";
+}
+
+<h3 class="mb-4">📈 Klinika statistikasi</h3>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-primary">
+            <div class="card-body text-center">
+                <h1 class="fw-bold">@Model.TotalPatients</h1>
+                <p class="mb-0">Jami bemorlar</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-success">
+            <div class="card-body text-center">
+                <h1 class="fw-bold">@Model.TotalProtocols</h1>
+                <p class="mb-0">Jami protokollar</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-info">
+            <div class="card-body text-center">
+                <h1 class="fw-bold">@Model.ActiveProtocols</h1>
+                <p class="mb-0">Faol protokollar</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-warning">
+            <div class="card-body text-center">
+                <h1 class="fw-bold">@Model.TodayAppointments</h1>
+                <p class="mb-0">Bugungi uchrashuvlar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header fw-semibold">Oxirgi 6 oy bo'yicha</div>
+    <div class="card-body">
+        @if (Model.MonthlyStats.Count == 0)
+        {
+            <p class="text-muted">Ma'lumotlar hali yetarli emas.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr><th>Oy</th><th>Protokollar soni</th><th>Bemorlar soni</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var stat in Model.MonthlyStats)
+                    {
+                        <tr>
+                            <td>@stat.Month</td>
+                            <td>@stat.ProtocolCount</td>
+                            <td>@stat.PatientCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
