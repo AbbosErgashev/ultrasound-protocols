@@ -29,12 +29,20 @@ public class ManageController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> NewsCreate(NewsCreateDto dto, IFormFile? imageFile, IFormFile? videoFile)
+    public async Task<IActionResult> NewsCreate(NewsCreateDto dto, IFormFile? imageFile)
     {
         if (imageFile != null && imageFile.Length > 0)
+        {
+            if (!IsImageFile(imageFile))
+            {
+                TempData["Error"] = "Faqat rasm faylini yuklash mumkin";
+                return RedirectToAction("News");
+            }
+
             dto.ImageUrl = await SaveFileAsync(imageFile, "news/images");
-        if (videoFile != null && videoFile.Length > 0)
-            dto.VideoUrl = await SaveFileAsync(videoFile, "news/videos");
+        }
+
+        dto.VideoUrl = null;
 
         await _contentService.CreateNewsAsync(dto, User.Identity?.Name ?? "admin");
         TempData["Success"] = "Yangilik qo'shildi";
@@ -43,12 +51,31 @@ public class ManageController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> NewsEdit(Guid id, NewsCreateDto dto, IFormFile? imageFile, IFormFile? videoFile)
+    public async Task<IActionResult> NewsEdit(Guid id, NewsCreateDto dto, IFormFile? imageFile)
     {
+        var current = await _contentService.GetNewsByIdAsync(id);
+        if (current is null)
+        {
+            TempData["Error"] = "Yangilik topilmadi";
+            return RedirectToAction("News");
+        }
+
         if (imageFile != null && imageFile.Length > 0)
+        {
+            if (!IsImageFile(imageFile))
+            {
+                TempData["Error"] = "Faqat rasm faylini yuklash mumkin";
+                return RedirectToAction("News");
+            }
+
             dto.ImageUrl = await SaveFileAsync(imageFile, "news/images");
-        if (videoFile != null && videoFile.Length > 0)
-            dto.VideoUrl = await SaveFileAsync(videoFile, "news/videos");
+        }
+        else
+        {
+            dto.ImageUrl = current.ImageUrl;
+        }
+
+        dto.VideoUrl = null;
 
         await _contentService.UpdateNewsAsync(id, dto);
         TempData["Success"] = "Yangilik yangilandi";
@@ -170,5 +197,13 @@ public class ManageController : Controller
         using var stream = System.IO.File.Create(fullPath);
         await file.CopyToAsync(stream);
         return $"/uploads/{subFolder}/{fileName}";
+    }
+
+    private static bool IsImageFile(IFormFile file)
+    {
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var allowedExtensions = new HashSet<string> { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+        return file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) &&
+               allowedExtensions.Contains(extension);
     }
 }

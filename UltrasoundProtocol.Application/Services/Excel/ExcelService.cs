@@ -37,7 +37,7 @@ public class ExcelService : IExcelService
             ws.Cell(row, 4).Value = p.PhoneNumber;
             ws.Cell(row, 5).Value = p.Email ?? "";
             ws.Cell(row, 6).Value = p.IsActive ? "Faol" : "Nofaol";
-            ws.Cell(row, 7).Value = p.CreatedAt.ToString("dd.MM.yyyy");
+            ws.Cell(row, 7).Value = p.CreatedDate.ToString("dd.MM.yyyy");
             row++;
         }
 

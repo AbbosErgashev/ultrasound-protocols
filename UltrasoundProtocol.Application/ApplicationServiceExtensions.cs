@@ -6,6 +6,7 @@ using UltrasoundProtocol.Application.Services.AI;
 using UltrasoundProtocol.Application.Services.Appointment;
 using UltrasoundProtocol.Application.Services.Audit;
 using UltrasoundProtocol.Application.Services.Auth;
+using UltrasoundProtocol.Application.Services.BreastProtocol;
 using UltrasoundProtocol.Application.Services.Content;
 using UltrasoundProtocol.Application.Services.Email;
 using UltrasoundProtocol.Application.Services.Excel;
@@ -48,6 +49,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPatientService, PatientService>();
         services.AddScoped<IProtocolService, ProtocolService>();
+        services.AddScoped<IBreastProtocolService, BreastProtocolService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IStatisticsService, StatisticsService>();

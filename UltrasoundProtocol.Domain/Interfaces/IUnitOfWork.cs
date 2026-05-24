@@ -8,6 +8,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<UltrasoundExam> UltrasoundExams { get; }
     IRepository<Diagnosis> Diagnoses { get; }
     IRepository<Report> Reports { get; }
+    IRepository<BreastUltrasoundProtocol> BreastUltrasoundProtocols { get; }
     IRepository<Appointment> Appointments { get; }
     IRepository<Notification> Notifications { get; }
     IRepository<AuditLog> AuditLogs { get; }

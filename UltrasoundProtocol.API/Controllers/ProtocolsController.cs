@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UltrasoundProtocol.Application.DTOs.Protocol;
+using UltrasoundProtocol.Application.Services.BreastProtocol;
 using UltrasoundProtocol.Application.Services.Excel;
 using UltrasoundProtocol.Application.Services.Patient;
 using UltrasoundProtocol.Application.Services.Pdf;
@@ -16,14 +17,16 @@ public class ProtocolsController : Controller
     private readonly IPatientService _patientService;
     private readonly IPdfService _pdfService;
     private readonly IExcelService _excelService;
+    private readonly IBreastProtocolService _breastProtocolService;
 
     public ProtocolsController(IProtocolService protocolService, IPatientService patientService,
-        IPdfService pdfService, IExcelService excelService)
+        IPdfService pdfService, IExcelService excelService, IBreastProtocolService breastProtocolService)
     {
         _protocolService = protocolService;
         _patientService = patientService;
         _pdfService = pdfService;
         _excelService = excelService;
+        _breastProtocolService = breastProtocolService;
     }
 
     public async Task<IActionResult> Index(string? search, string? status)
@@ -71,7 +74,15 @@ public class ProtocolsController : Controller
     {
         var protocol = await _protocolService.GetByIdAsync(id);
         if (protocol is null) return NotFound();
-        var pdf = _pdfService.GenerateProtocolPdf(protocol, protocol.AIAnalysisResult);
+
+        var breastProtocol = protocol.BodyPart.Equals("Sut bezlari", StringComparison.OrdinalIgnoreCase)
+            ? await _breastProtocolService.GetPdfDataByExamIdAsync(id)
+            : null;
+
+        var pdf = breastProtocol is null
+            ? _pdfService.GenerateProtocolPdf(protocol, protocol.AIAnalysisResult)
+            : _pdfService.GenerateBreastProtocolPdf(protocol, breastProtocol, protocol.AIAnalysisResult);
+
         return File(pdf, "application/pdf", $"UZI_Protokol_{protocol.BodyPart}_{protocol.ExamDate:yyyyMMdd}.pdf");
     }
 

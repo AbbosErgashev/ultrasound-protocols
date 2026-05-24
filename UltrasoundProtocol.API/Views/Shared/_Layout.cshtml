@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — MedUZI</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/app.css" />
+    <link rel="stylesheet" href="/app.css?v=20260524-1" />
     <style>
         body { display: flex; min-height: 100vh; background: #f8fafc; }
         .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg,#1e3a5f 0%,#2d5986 100%); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
@@ -32,9 +32,10 @@
                 <div class="nav-section">Klinik</div>
                 <a class="nav-link" href="/Patients">👥 Bemorlar</a>
                 <a class="nav-link" href="/Protocols">📋 Protokollar</a>
-                <a class="nav-link" href="/Protocols/Create">➕ Yangi protokol</a>
-                <a class="nav-link" href="/AIAnalysis">🤖 AI Tahlil</a>
-                <a class="nav-link" href="/Appointments">📅 Randevular</a>
+                @* <a class="nav-link" href="/Protocols/Create">➕ Yangi protokol</a> *@
+                <a class="nav-link" href="/BreastProtocols/Create">👨‍🔬 Sut bezlari UTT</a>
+                @* <a class="nav-link" href="/AIAnalysis">🤖 AI Tahlil</a> *@
+                <a class="nav-link" href="/Appointments">📅 Qabullar</a>
             }
 
             @if (User.IsInRole("User"))
@@ -79,7 +80,7 @@
                         _ => "bg-secondary"
                     };
                 }
-                <span class="badge @roleColor role-badge">@role</span>
+                @* <span class="badge @roleColor role-badge">@role</span> *@
                 <span class="text-dark fw-semibold small">@User.Identity!.Name</span>
                 <a href="/Auth/Logout" class="btn btn-sm btn-outline-danger">Chiqish</a>
             </div>

@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<UltrasoundExam> UltrasoundExams { get; }
     public IRepository<Diagnosis> Diagnoses { get; }
     public IRepository<Report> Reports { get; }
+    public IRepository<BreastUltrasoundProtocol> BreastUltrasoundProtocols { get; }
     public IRepository<Appointment> Appointments { get; }
     public IRepository<Notification> Notifications { get; }
     public IRepository<AuditLog> AuditLogs { get; }
@@ -26,6 +27,7 @@ public class UnitOfWork : IUnitOfWork
         UltrasoundExams = new GenericRepository<UltrasoundExam>(context);
         Diagnoses = new GenericRepository<Diagnosis>(context);
         Reports = new GenericRepository<Report>(context);
+        BreastUltrasoundProtocols = new GenericRepository<BreastUltrasoundProtocol>(context);
         Appointments = new GenericRepository<Appointment>(context);
         Notifications = new GenericRepository<Notification>(context);
         AuditLogs = new GenericRepository<AuditLog>(context);

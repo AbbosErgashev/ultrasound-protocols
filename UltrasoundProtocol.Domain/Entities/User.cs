@@ -6,6 +6,7 @@ public class User : BaseEntity
 {
     public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public DateTime DateOfBirth { get; set; }
     public string Gender { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;

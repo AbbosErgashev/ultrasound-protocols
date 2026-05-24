@@ -23,6 +23,7 @@ public class ProtocolService : IProtocolService
     {
         _logger.LogDebug("Barcha protokollar so'raldi");
         var protocols = await _unitOfWork.UltrasoundExams.GetAllAsync();
+        await AttachPatientsAsync(protocols);
         var result = _mapper.Map<IEnumerable<ProtocolDto>>(protocols);
         _logger.LogInformation("Protokollar ro'yxati: {Count} ta", result.Count());
         return result;
@@ -32,8 +33,13 @@ public class ProtocolService : IProtocolService
     {
         var protocol = await _unitOfWork.UltrasoundExams.GetByIdAsync(id);
         if (protocol is null)
+        {
             _logger.LogWarning("Protokol topilmadi: {ProtocolId}", id);
-        return protocol is null ? null : _mapper.Map<ProtocolDto>(protocol);
+            return null;
+        }
+
+        await AttachPatientsAsync([protocol]);
+        return _mapper.Map<ProtocolDto>(protocol);
     }
 
     public async Task<IEnumerable<ProtocolDto>> GetByPatientIdAsync(Guid patientId)
@@ -41,6 +47,7 @@ public class ProtocolService : IProtocolService
         _logger.LogDebug("Bemor protokollari so'raldi: {PatientId}", patientId);
         var protocols = await _unitOfWork.UltrasoundExams
             .FindAsync(p => p.PatientId == patientId);
+        await AttachPatientsAsync(protocols);
         return _mapper.Map<IEnumerable<ProtocolDto>>(protocols);
     }
 
@@ -100,5 +107,21 @@ public class ProtocolService : IProtocolService
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("AI tahlil saqlandi: {ProtocolId}", protocolId);
         return true;
+    }
+
+    private async Task AttachPatientsAsync(IEnumerable<UltrasoundExam> protocols)
+    {
+        var protocolList = protocols.ToList();
+        if (protocolList.Count == 0)
+            return;
+
+        var patients = (await _unitOfWork.Users.GetAllAsync())
+            .ToDictionary(patient => patient.Id);
+
+        foreach (var protocol in protocolList)
+        {
+            if (protocol.Patient is null && patients.TryGetValue(protocol.PatientId, out var patient))
+                protocol.Patient = patient;
+        }
     }
 }

@@ -13,13 +13,13 @@
             </div>
         </div>
         <table class="table table-borderless">
-            <tr><td class="fw-bold" style="width:40%">Ism:</td><td>@ViewBag.FullName</td></tr>
+            <tr><td class="fw-bold" style="width:40%">Lavozim:</td><td>@ViewBag.FullName</td></tr>
             <tr><td class="fw-bold">Login:</td><td>@ViewBag.Username</td></tr>
-            <tr><td class="fw-bold">Rol:</td><td><span class="badge bg-primary">@ViewBag.Role</span></td></tr>
-            <tr>
+            @* <tr><td class="fw-bold">Claim:</td><td><span class="badge bg-primary">@ViewBag.Role</span></td></tr> *@
+            @* <tr>
                 <td class="fw-bold">User ID:</td>
                 <td>@(string.IsNullOrEmpty(userId) ? "Statik foydalanuvchi" : userId)</td>
-            </tr>
+            </tr> *@
         </table>
         <hr />
         <a href="/Auth/Logout" class="btn btn-outline-danger w-100">🚪 Tizimdan chiqish</a>

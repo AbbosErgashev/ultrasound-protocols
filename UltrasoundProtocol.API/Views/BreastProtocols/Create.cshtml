@@ -1,0 +1,376 @@
+@model BreastProtocolCreateDto
+@{
+    ViewData["Title"] = "Sut bezlari UTT";
+    var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
+
+    string[] machineOptions = ["Siemens", "Philips", "Mindray", "GE", "Canon", "Chison", "Hitachi", "Supersonic", "Esaote", "Clarius", "Sonoscape", "SIUI", "Boshqa variant"];
+    string[] probeOptions = ["Chiziqli L 5-12 MGts", "Chiziqli L 4-9 MGts", "Boshqa variant"];
+    string[] symmetryOptions = ["Simmetrik", "Asimmetrik", "O'ng qisman rezeksiya qilingan", "Chap qisman rezeksiya qilingan", "O'ng to'liq rezeksiya qilingan", "Chap to'liq rezeksiya qilingan", "O'ng rivojlanmagan", "Chap rivojlanmagan", "Boshqa variant"];
+    string[] skinOptions = ["Tekis giperechogen chiziq", "Notekis giperechogen chiziq", "Tekis gipoechogen chiziq", "Notekis gipoechogen chiziq", "Boshqa variant"];
+    string[] nippleOptions = ["Yumaloq shaklda", "Ikkilangan", "Ichkariga tortilgan", "Boshqa variant"];
+    string[] visibilityOptions = ["Ko'rinadi", "Akustik soya aniqlanadi", "Boshqa variant"];
+    string[] structureOptions = ["Bir xil", "Har xil", "Boshqa variant"];
+    string[] differentiationOptions = ["Yaxshi", "Yog' to'qimasi hisobiga chegaralangan", "To'qimalar gipoechogenligi hisobiga chegaralangan"];
+    string[] fatOptions = ["Sust ifodalangan", "O'rtacha ifodalangan", "Yaqqol ifodalangan"];
+    string[] tissueRatioOptions = ["Bez to'qimasi ustun", "Bez va yog' to'qimasi teng miqdorda", "Yog' to'qimasi ustun"];
+    string[] focalOptions = ["Aniqlandi", "Aniqlanmadi"];
+    string[] ductsOptions = ["Kengaymagan", "Kengaygan"];
+    string[] ductWallOptions = ["Bir xil", "Qalinlashgan", "Boshqa variant"];
+    string[] ductContentOptions = ["Anexogen", "Xususiyatsiz", "Boshqa variant"];
+    string[] lymphOptions = ["Ko'rinadi", "Ko'rinmaydi"];
+    string[] breastOptions = ["O'ng", "Chap"];
+    string[] zoneOptions = ["tepa-tashqi", "tepa-ichki", "pastki-tashqi", "pastki-ichki", "so'rg'ich orqa", "markaziy", "tashqi", "ichki"];
+    string[] orientationOptions = ["gorizontal", "vertikal", "noaniq"];
+    string[] contourOptions = ["aniq", "noaniq", "tekis", "notekis", "nursimon", "g'adir-budir"];
+    string[] echogenicityOptions = ["gipoechogen", "izoechogen", "anexogen", "giperechogen", "aralash"];
+    string[] distalOptions = ["o'zgarishsiz", "dorsal kuchayish", "dorsal akustik soya"];
+    string[] calcificationOptions = ["yo'q", "bor"];
+    string[] biradsOptions = ["1", "2", "3", "4A", "4B", "4C", "5", "6"];
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-1">Sut bezlarining ultratovush tekshiruvi</h3>
+        <div class="text-muted small">Bitta organ tizimi uchun strukturali protokol</div>
+    </div>
+    <a href="/Protocols" class="btn btn-outline-secondary btn-sm">Protokollar ro'yxati</a>
+</div>
+
+<form method="post" asp-controller="BreastProtocols" asp-action="Create" class="breast-protocol-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-semibold">1. Umumiy ma'lumotlar</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Tibbiy muassasa nomi</label>
+                    <input asp-for="MedicalInstitutionName" class="form-control" placeholder="Tibbiy muassasa nomi" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">№ protokola</label>
+                    <input asp-for="ProtocolNumber" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Tibbiy muassasa manzili</label>
+                    <input asp-for="MedicalInstitutionAddress" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Bemor</label>
+                    <select asp-for="PatientId" class="form-select" required>
+                        <option value="">Tanlang...</option>
+                        @foreach (var p in patients)
+                        {
+                            <option value="@p.Id">@p.FullName - @p.PhoneNumber</option>
+                        }
+                    </select>
+                    <span asp-validation-for="PatientId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tekshiruv sanasi</label>
+                    <input asp-for="ExamDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Shifokor</label>
+                    <input asp-for="DoctorName" class="form-control" placeholder="F.I.O." />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">UZI apparati</label>
+                    @Html.DropDownListFor(m => m.UltrasoundMachine, new SelectList(machineOptions, Model.UltrasoundMachine), "Tanlang", new { @class = "form-select" })
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Datchik turi va chastotasi</label>
+                    @Html.DropDownListFor(m => m.Probe, new SelectList(probeOptions, Model.Probe), "Tanlang", new { @class = "form-select" })
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">UZI tekshiruvi №</label>
+                    <input asp-for="UltrasoundExamNumber" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Vazni (kg)</label>
+                    <input asp-for="PatientWeightKg" type="number" step="0.1" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Bo'yi (cm)</label>
+                    <input asp-for="PatientHeightCm" type="number" step="0.1" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-semibold">2. Asosiy ma'lumotlar</div>
+        <div class="card-body">
+            <label class="form-label">Sut bezlari simmetrikligi</label>
+            @Html.DropDownListFor(m => m.Symmetry, new SelectList(symmetryOptions, Model.Symmetry), "Tanlang", new { @class = "form-select" })
+            <div class="form-text">(normada - simmetrik)</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-6">
+            <div class="card breast-side-card h-100">
+                <div class="card-header fw-semibold bg-primary text-white">O'ng sut bezi</div>
+                <div class="card-body">
+                    <div class="protocol-section">
+                        <h6>Teri</h6>
+                        @Html.DropDownListFor(m => m.Right.SkinLine, new SelectList(skinOptions, Model.Right.SkinLine), "Tanlang", new { @class = "form-select mb-2" })
+                        <input asp-for="Right.SkinThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Strukturasi</h6>
+                        @Html.DropDownListFor(m => m.Right.Structure, new SelectList(structureOptions, Model.Right.Structure), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>So'rg'ich</h6>
+                        @Html.DropDownListFor(m => m.Right.Nipple, new SelectList(nippleOptions, Model.Right.Nipple), "Tanlang", new { @class = "form-select" })
+                        <div class="form-text">(norma - yumaloq, aniq chegaralangan)</div>
+                    </div>
+                    <div class="protocol-section">
+                        <h6>So'rg'ich orqa zonasi</h6>
+                        @Html.DropDownListFor(m => m.Right.RetroareolarZone, new SelectList(visibilityOptions, Model.Right.RetroareolarZone), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Right.RetroareolarEchostructure, new SelectList(structureOptions, Model.Right.RetroareolarEchostructure), "Exostruktura", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>To'qimani farqlash</h6>
+                        @Html.DropDownListFor(m => m.Right.TissueDifferentiation, new SelectList(differentiationOptions, Model.Right.TissueDifferentiation), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Teri osti yog' to'qimasi</h6>
+                        @Html.DropDownListFor(m => m.Right.SubcutaneousFat, new SelectList(fatOptions, Model.Right.SubcutaneousFat), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Right.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Right.SubcutaneousFatEchostructure), "Exostruktura", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Fibroglandulyar kompleks</h6>
+                        <input asp-for="Right.FibroglandularComplexThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Sut bezini hosil qiluvchi to'qimalar nisbati</h6>
+                        @Html.DropDownListFor(m => m.Right.TissueRatio, new SelectList(tissueRatioOptions, Model.Right.TissueRatio), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Exostruktura</h6>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Right.Echostructure" value="Bez to'qimasi bir xil emas, asosan giperechogen tuzilma ko'rinishida" id="rightEcho1" /><label class="form-check-label" for="rightEcho1">Bez to'qimasi bir xil emas, asosan giperechogen tuzilma ko'rinishida.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Right.Echostructure" value="Bez to'qimasi bir xil emas, asosan gipoechogen tuzilma ko'rinishida" id="rightEcho2" /><label class="form-check-label" for="rightEcho2">Bez to'qimasi bir xil emas, asosan gipoechogen tuzilma ko'rinishida.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Right.Echostructure" value="Adenoz bez to'qimasi o'choqlari qayd etiladi" id="rightEcho3" /><label class="form-check-label" for="rightEcho3">Adenoz bez to'qimasi o'choqlari qayd etiladi.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Right.Echostructure" value="Chiziqli va yumaloq fibroz o'choqlari qayd etiladi" id="rightEcho4" /><label class="form-check-label" for="rightEcho4">Chiziqli va yumaloq fibroz o'choqlari qayd etiladi.</label></div>
+                        <div class="form-text">(normada gormonal statusga bog'liq)</div>
+                    </div>
+                    <div class="protocol-section">
+                        <h6>O'choqli o'zgarishlar</h6>
+                        @Html.DropDownListFor(m => m.Right.FocalChanges, new SelectList(focalOptions, Model.Right.FocalChanges), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Sut yo'llari</h6>
+                        @Html.DropDownListFor(m => m.Right.Ducts, new SelectList(ductsOptions, Model.Right.Ducts), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Right.DuctWall, new SelectList(ductWallOptions, Model.Right.DuctWall), "Sut yo'llari devori", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Right.DuctContent, new SelectList(ductContentOptions, Model.Right.DuctContent), "Sut yo'llari tarkibi", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Retromammar yog' qatlami</h6>
+                        @Html.DropDownListFor(m => m.Right.RetromammaryFat, new SelectList(fatOptions, Model.Right.RetromammaryFat), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section mb-0">
+                        <h6>Intramammmar limfa tugunlari</h6>
+                        @Html.DropDownListFor(m => m.Right.IntramammaryLymphNodes, new SelectList(lymphOptions, Model.Right.IntramammaryLymphNodes), "Tanlang", new { @class = "form-select" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card breast-side-card h-100">
+                <div class="card-header fw-semibold bg-primary text-white">Chap sut bezi</div>
+                <div class="card-body">
+                    <div class="protocol-section">
+                        <h6>Teri</h6>
+                        @Html.DropDownListFor(m => m.Left.SkinLine, new SelectList(skinOptions, Model.Left.SkinLine), "Tanlang", new { @class = "form-select mb-2" })
+                        <input asp-for="Left.SkinThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Strukturasi</h6>
+                        @Html.DropDownListFor(m => m.Left.Structure, new SelectList(structureOptions, Model.Left.Structure), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>So'rg'ich</h6>
+                        @Html.DropDownListFor(m => m.Left.Nipple, new SelectList(nippleOptions, Model.Left.Nipple), "Tanlang", new { @class = "form-select" })
+                        <div class="form-text">(norma - yumaloq, aniq chegaralangan)</div>
+                    </div>
+                    <div class="protocol-section">
+                        <h6>So'rg'ich orqa zonasi</h6>
+                        @Html.DropDownListFor(m => m.Left.RetroareolarZone, new SelectList(visibilityOptions, Model.Left.RetroareolarZone), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Left.RetroareolarEchostructure, new SelectList(structureOptions, Model.Left.RetroareolarEchostructure), "Exostruktura", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>To'qimani farqlash</h6>
+                        @Html.DropDownListFor(m => m.Left.TissueDifferentiation, new SelectList(differentiationOptions, Model.Left.TissueDifferentiation), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Teri osti yog' to'qimasi</h6>
+                        @Html.DropDownListFor(m => m.Left.SubcutaneousFat, new SelectList(fatOptions, Model.Left.SubcutaneousFat), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Left.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Left.SubcutaneousFatEchostructure), "Exostruktura", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Fibroglandulyar kompleks</h6>
+                        <input asp-for="Left.FibroglandularComplexThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Sut bezini hosil qiluvchi to'qimalar nisbati</h6>
+                        @Html.DropDownListFor(m => m.Left.TissueRatio, new SelectList(tissueRatioOptions, Model.Left.TissueRatio), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Exostruktura</h6>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Left.Echostructure" value="Bez to'qimasi bir xil emas, asosan giperechogen tuzilma ko'rinishida" id="leftEcho1" /><label class="form-check-label" for="leftEcho1">Bez to'qimasi bir xil emas, asosan giperechogen tuzilma ko'rinishida.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Left.Echostructure" value="Bez to'qimasi bir xil emas, asosan gipoechogen tuzilma ko'rinishida" id="leftEcho2" /><label class="form-check-label" for="leftEcho2">Bez to'qimasi bir xil emas, asosan gipoechogen tuzilma ko'rinishida.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Left.Echostructure" value="Adenoz bez to'qimasi o'choqlari qayd etiladi" id="leftEcho3" /><label class="form-check-label" for="leftEcho3">Adenoz bez to'qimasi o'choqlari qayd etiladi.</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" name="Left.Echostructure" value="Chiziqli va yumaloq fibroz o'choqlari qayd etiladi" id="leftEcho4" /><label class="form-check-label" for="leftEcho4">Chiziqli va yumaloq fibroz o'choqlari qayd etiladi.</label></div>
+                        <div class="form-text">(normada gormonal statusga bog'liq)</div>
+                    </div>
+                    <div class="protocol-section">
+                        <h6>O'choqli o'zgarishlar</h6>
+                        @Html.DropDownListFor(m => m.Left.FocalChanges, new SelectList(focalOptions, Model.Left.FocalChanges), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Sut yo'llari</h6>
+                        @Html.DropDownListFor(m => m.Left.Ducts, new SelectList(ductsOptions, Model.Left.Ducts), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Left.DuctWall, new SelectList(ductWallOptions, Model.Left.DuctWall), "Sut yo'llari devori", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Left.DuctContent, new SelectList(ductContentOptions, Model.Left.DuctContent), "Sut yo'llari tarkibi", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section">
+                        <h6>Retromammar yog' qatlami</h6>
+                        @Html.DropDownListFor(m => m.Left.RetromammaryFat, new SelectList(fatOptions, Model.Left.RetromammaryFat), "Tanlang", new { @class = "form-select" })
+                    </div>
+                    <div class="protocol-section mb-0">
+                        <h6>Intramammmar limfa tugunlari</h6>
+                        @Html.DropDownListFor(m => m.Left.IntramammaryLymphNodes, new SelectList(lymphOptions, Model.Left.IntramammaryLymphNodes), "Tanlang", new { @class = "form-select" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header fw-semibold">O'choqli hosila</div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input asp-for="Lesion.Detected" class="form-check-input" />
+                <label asp-for="Lesion.Detected" class="form-check-label">Hosila aniqlangan</label>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Breast, new SelectList(breastOptions, Model.Lesion.Breast), "Sut bezi", new { @class = "form-select" })</div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Zone, new SelectList(zoneOptions, Model.Lesion.Zone), "Zona", new { @class = "form-select" })</div>
+                <div class="col-md-3"><input asp-for="Lesion.SizeMm" class="form-control" placeholder="O'lchami, mm" /></div>
+                <div class="col-md-3"><input asp-for="Lesion.Shape" class="form-control" placeholder="Shakli, masalan oval" /></div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Orientation, new SelectList(orientationOptions, Model.Lesion.Orientation), "Joylashuv yo'nalishi", new { @class = "form-select" })</div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Contours, new SelectList(contourOptions, Model.Lesion.Contours), "Konturlari", new { @class = "form-select" })</div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Structure, new SelectList(structureOptions, Model.Lesion.Structure), "Tuzilmasi", new { @class = "form-select" })</div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Echogenicity, new SelectList(echogenicityOptions, Model.Lesion.Echogenicity), "Exogenligi", new { @class = "form-select" })</div>
+                <div class="col-md-4">@Html.DropDownListFor(m => m.Lesion.DistalAcousticEffect, new SelectList(distalOptions, Model.Lesion.DistalAcousticEffect), "Distal akustik ta'siri", new { @class = "form-select" })</div>
+                <div class="col-md-4">@Html.DropDownListFor(m => m.Lesion.Calcifications, new SelectList(calcificationOptions, Model.Lesion.Calcifications), "Kalsinatlar", new { @class = "form-select" })</div>
+                <div class="col-md-4"><input asp-for="Lesion.CalcificationSizeMm" type="number" step="0.1" class="form-control" placeholder="Kalsinat diametri, mm" /></div>
+                <div class="col-12">
+                    <textarea asp-for="Lesion.AdditionalChanges" class="form-control" rows="2" placeholder="Qo'shimcha o'zgarishlar"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header fw-semibold">Kistalar</div>
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Kvadrantlarda joylashuvi</th><th>O'ng sut bezi, mm</th><th>Chap sut bezi, mm</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Tepa-tashqi kvadrant</td><td><input asp-for="Cysts.UpperOuterRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.UpperOuterLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Tepa-ichki kvadrant</td><td><input asp-for="Cysts.UpperInnerRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.UpperInnerLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Pastki-tashqi kvadrant</td><td><input asp-for="Cysts.LowerOuterRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.LowerOuterLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Pastki-ichki kvadrant</td><td><input asp-for="Cysts.LowerInnerRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.LowerInnerLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Tashqi kvadrantlar chegarasi</td><td><input asp-for="Cysts.OuterBorderRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.OuterBorderLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Tepa kvadrantlar chegarasi</td><td><input asp-for="Cysts.UpperBorderRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.UpperBorderLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Ichki kvadrantlar chegarasi</td><td><input asp-for="Cysts.InnerBorderRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.InnerBorderLeft" class="form-control form-control-sm" /></td></tr>
+                    <tr><td>Pastki kvadrantlar chegarasi</td><td><input asp-for="Cysts.LowerBorderRight" class="form-control form-control-sm" /></td><td><input asp-for="Cysts.LowerBorderLeft" class="form-control form-control-sm" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header fw-semibold">Regional limfa tugunlari</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3"><input asp-for="RegionalLymphNodes.RightSizeMm" class="form-control" placeholder="O'ngdan, mm gacha" /></div>
+                <div class="col-md-3"><input asp-for="RegionalLymphNodes.LeftSizeMm" class="form-control" placeholder="Chapdan, mm gacha" /></div>
+                <div class="col-md-3"><input asp-for="RegionalLymphNodes.Count" class="form-control" placeholder="Soni" /></div>
+                <div class="col-md-3"><input asp-for="RegionalLymphNodes.Structure" class="form-control" placeholder="Tuzilmasi" /></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header fw-semibold">3-5. Yakuniy ma'lumotlar</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Qo'shimcha ma'lumotlar</label>
+                <textarea asp-for="AdditionalInfo" rows="3" class="form-control"></textarea>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-9">
+                    <label class="form-label">Xulosa</label>
+                    <textarea asp-for="Conclusion" rows="3" class="form-control" placeholder="Bo'sh qoldirilsa avtomatik xulosa tuziladi"></textarea>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">BI-RADS</label>
+                    @Html.DropDownListFor(m => m.Birads, new SelectList(biradsOptions, Model.Birads), "Tanlang", new { @class = "form-select" })
+                </div>
+            </div>
+            <div class="mt-3">
+                <label class="form-label">Tavsiyalar</label>
+                <textarea asp-for="Recommendations" rows="3" class="form-control" placeholder="Bo'sh qoldirilsa standart tavsiya qo'shiladi"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center gap-2 my-4">
+        <button type="submit" class="btn btn-primary px-4">Saqlash</button>
+        <a href="/Protocols" class="btn btn-outline-secondary px-4">Bekor qilish</a>
+    </div>
+</form>
+
+@section Scripts {
+<style>
+    .breast-protocol-form .card {
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .breast-protocol-form .card-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .breast-side-card > .card-header {
+        background: #1b6ec2 !important;
+    }
+
+    .protocol-section {
+        padding: 0.85rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        margin-bottom: 0.85rem;
+        background: #fff;
+    }
+
+    .protocol-section h6 {
+        font-weight: 700;
+        margin-bottom: 0.55rem;
+        color: #0f2742;
+    }
+
+    .form-check {
+        margin-bottom: 0.45rem;
+    }
+</style>
+}
