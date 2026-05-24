@@ -60,10 +60,9 @@ public class ExcelService : IExcelService
         ws.Cell(1, 5).Value = "Topilmalar";
         ws.Cell(1, 6).Value = "Xulosa";
         ws.Cell(1, 7).Value = "Holat";
-        ws.Cell(1, 8).Value = "AI tahlil";
 
-        ws.Range("A1:H1").Style.Font.Bold = true;
-        ws.Range("A1:H1").Style.Fill.BackgroundColor = XLColor.LightGreen;
+        ws.Range("A1:G1").Style.Font.Bold = true;
+        ws.Range("A1:G1").Style.Fill.BackgroundColor = XLColor.LightGreen;
 
         var row = 2;
         foreach (var p in protocols)
@@ -75,7 +74,6 @@ public class ExcelService : IExcelService
             ws.Cell(row, 5).Value = p.Findings;
             ws.Cell(row, 6).Value = p.Conclusion;
             ws.Cell(row, 7).Value = p.Status.ToString();
-            ws.Cell(row, 8).Value = string.IsNullOrEmpty(p.AIAnalysisResult) ? "Yo'q" : "Bor";
             row++;
         }
 

@@ -13,7 +13,6 @@ public class ProtocolDto
     public string Findings { get; set; } = string.Empty;
     public string Conclusion { get; set; } = string.Empty;
     public string? ImagePath { get; set; }
-    public string? AIAnalysisResult { get; set; }
     public ProtocolStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
 }

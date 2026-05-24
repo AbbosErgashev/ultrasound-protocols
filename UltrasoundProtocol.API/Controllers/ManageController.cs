@@ -78,7 +78,7 @@ public class ManageController : Controller
         dto.VideoUrl = null;
 
         await _contentService.UpdateNewsAsync(id, dto);
-        TempData["Success"] = "Yangilik yangilandi";
+        TempData["Success"] = "Yangilanish muvafaqqiyatli amalga oshirildi";
         return RedirectToAction("News");
     }
 

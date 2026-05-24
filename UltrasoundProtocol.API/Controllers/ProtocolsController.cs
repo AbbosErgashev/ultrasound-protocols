@@ -80,8 +80,8 @@ public class ProtocolsController : Controller
             : null;
 
         var pdf = breastProtocol is null
-            ? _pdfService.GenerateProtocolPdf(protocol, protocol.AIAnalysisResult)
-            : _pdfService.GenerateBreastProtocolPdf(protocol, breastProtocol, protocol.AIAnalysisResult);
+            ? _pdfService.GenerateProtocolPdf(protocol)
+            : _pdfService.GenerateBreastProtocolPdf(protocol, breastProtocol);
 
         return File(pdf, "application/pdf", $"UZI_Protokol_{protocol.BodyPart}_{protocol.ExamDate:yyyyMMdd}.pdf");
     }

@@ -11,7 +11,6 @@ public class UltrasoundExam : BaseEntity
     public string Findings { get; set; } = string.Empty;
     public string Conclusion { get; set; } = string.Empty;
     public string? ImagePath { get; set; }
-    public string? AIAnalysisResult { get; set; }
     public ProtocolStatus Status { get; set; } = ProtocolStatus.Draft;
 
     public User Patient { get; set; } = null!;

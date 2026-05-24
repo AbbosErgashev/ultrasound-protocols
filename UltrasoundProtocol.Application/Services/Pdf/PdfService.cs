@@ -9,13 +9,13 @@ namespace UltrasoundProtocol.Application.Services.Pdf;
 
 public interface IPdfService
 {
-    byte[] GenerateProtocolPdf(ProtocolDto protocol, string? aiAnalysis = null);
-    byte[] GenerateBreastProtocolPdf(ProtocolDto protocol, BreastProtocolPdfDto breastProtocol, string? aiAnalysis = null);
+    byte[] GenerateProtocolPdf(ProtocolDto protocol);
+    byte[] GenerateBreastProtocolPdf(ProtocolDto protocol, BreastProtocolPdfDto breastProtocol);
 }
 
 public class PdfService : IPdfService
 {
-    public byte[] GenerateProtocolPdf(ProtocolDto protocol, string? aiAnalysis = null)
+    public byte[] GenerateProtocolPdf(ProtocolDto protocol)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -28,7 +28,7 @@ public class PdfService : IPdfService
                 page.DefaultTextStyle(x => x.FontSize(11));
 
                 page.Header().Element(c => ComposeHeader(c, protocol));
-                page.Content().Element(c => ComposeContent(c, protocol, aiAnalysis));
+                page.Content().Element(c => ComposeContent(c, protocol));
                 page.Footer().Element(ComposeFooter);
             });
         });
@@ -36,7 +36,7 @@ public class PdfService : IPdfService
         return document.GeneratePdf();
     }
 
-    public byte[] GenerateBreastProtocolPdf(ProtocolDto protocol, BreastProtocolPdfDto breastProtocol, string? aiAnalysis = null)
+    public byte[] GenerateBreastProtocolPdf(ProtocolDto protocol, BreastProtocolPdfDto breastProtocol)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -49,7 +49,7 @@ public class PdfService : IPdfService
                 page.DefaultTextStyle(x => x.FontSize(9).LineHeight(1.25f));
 
                 page.Header().Element(c => ComposeBreastHeader(c, protocol, breastProtocol));
-                page.Content().Element(c => ComposeBreastContent(c, protocol, breastProtocol, aiAnalysis));
+                page.Content().Element(c => ComposeBreastContent(c, protocol, breastProtocol));
                 page.Footer().Element(ComposeFooter);
             });
         });
@@ -89,7 +89,7 @@ public class PdfService : IPdfService
         });
     }
 
-    private static void ComposeContent(IContainer container, ProtocolDto protocol, string? aiAnalysis)
+    private static void ComposeContent(IContainer container, ProtocolDto protocol)
     {
         container.PaddingVertical(10).Column(col =>
         {
@@ -110,15 +110,6 @@ public class PdfService : IPdfService
                 .FontSize(12).Bold().FontColor(Colors.Blue.Darken2);
             col.Item().PaddingBottom(5).Border(1).BorderColor(Colors.Grey.Lighten2)
                 .Padding(8).Text(protocol.Conclusion).FontSize(10).LineHeight(1.5f);
-
-            if (!string.IsNullOrEmpty(aiAnalysis))
-            {
-                col.Item().PaddingTop(10).Text("AI TAHLILI")
-                    .FontSize(12).Bold().FontColor(Colors.Green.Darken2);
-                col.Item().Border(1).BorderColor(Colors.Green.Lighten2)
-                    .Background(Colors.Green.Lighten5).Padding(8)
-                    .Text(aiAnalysis).FontSize(9).LineHeight(1.4f);
-            }
 
             col.Item().PaddingTop(30).Row(row =>
             {
@@ -170,8 +161,7 @@ public class PdfService : IPdfService
     private static void ComposeBreastContent(
         IContainer container,
         ProtocolDto protocol,
-        BreastProtocolPdfDto breastProtocol,
-        string? aiAnalysis)
+        BreastProtocolPdfDto breastProtocol)
     {
         container.PaddingTop(8).Column(col =>
         {
@@ -199,9 +189,6 @@ public class PdfService : IPdfService
 
             if (!string.IsNullOrWhiteSpace(breastProtocol.Recommendations))
                 col.Item().Element(c => TextBox(c, "Tavsiyalar", breastProtocol.Recommendations!));
-
-            if (!string.IsNullOrWhiteSpace(aiAnalysis))
-                col.Item().Element(c => TextBox(c, "AI tahlili", aiAnalysis!, true));
 
             col.Item().PaddingTop(18).Row(row =>
             {

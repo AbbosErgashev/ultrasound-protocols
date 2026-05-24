@@ -2,26 +2,6 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* AI Analysis Result */
-.ai-result {
-    max-height: 600px;
-    overflow-y: auto;
-}
-
-.ai-content h5 {
-    color: #1b6ec2;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 0.3rem;
-}
-
-.ai-content li {
-    margin-bottom: 0.3rem;
-}
-
-.ai-content p {
-    line-height: 1.7;
-}
-
 a, .btn-link {
     color: #006bb7;
 }
