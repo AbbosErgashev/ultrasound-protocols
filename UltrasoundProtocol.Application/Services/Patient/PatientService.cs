@@ -28,7 +28,8 @@ public class PatientService : IPatientService
     {
         _logger.LogDebug("Barcha bemorlar ro'yxati so'raldi");
         var users = await _unitOfWork.Users.FindAsync(u => u.Role == UserRole.User);
-        var result = _mapper.Map<IEnumerable<PatientDto>>(users);
+        var orderedUsers = users.OrderByDescending(u => u.CreatedDate);
+        var result = _mapper.Map<IEnumerable<PatientDto>>(orderedUsers);
         _logger.LogInformation("Bemorlar ro'yxati qaytarildi: {Count} ta", result.Count());
         return result;
     }
@@ -55,6 +56,7 @@ public class PatientService : IPatientService
         user.PasswordHash = _passwordHasher.Hash(dto.Password);
         user.Role = UserRole.User;
         user.IsActive = true;
+        user.CreatedDate = DateTime.UtcNow;
 
         await _unitOfWork.Users.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();

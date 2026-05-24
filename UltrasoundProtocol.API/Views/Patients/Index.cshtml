@@ -27,6 +27,7 @@ else
                         <th>Telefon</th>
                         <th>Jins</th>
                         <th>Tug'ilgan</th>
+                        <th>Qo'shilgan</th>
                         <th>Holat</th>
                         @if (User.IsInRole("ChiefDoctor"))
                         {
@@ -43,6 +44,7 @@ else
                             <td>@p.PhoneNumber</td>
                             <td>@p.Gender</td>
                             <td>@p.DateOfBirth.ToString("dd.MM.yyyy")</td>
+                            <td>@p.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
                                 <span class="badge @(p.IsActive ? "bg-success" : "bg-secondary")">
                                     @(p.IsActive ? "Faol" : "Nofaol")

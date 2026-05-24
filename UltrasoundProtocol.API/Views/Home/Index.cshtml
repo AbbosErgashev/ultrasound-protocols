@@ -7,10 +7,34 @@
 }
 
 @functions {
-    static bool IsDirectVideo(string url) =>
-        url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
-        url.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ||
-        url.StartsWith("/uploads", StringComparison.OrdinalIgnoreCase);
+    static string? NormalizeMediaUrl(string? value)
+    {
+        var mediaUrl = value?.Trim();
+        if (string.IsNullOrWhiteSpace(mediaUrl))
+            return null;
+
+        if (Uri.TryCreate(mediaUrl, UriKind.Absolute, out _))
+            return mediaUrl;
+
+        mediaUrl = mediaUrl.Replace("\\", "/").TrimStart('/');
+        return "/" + mediaUrl;
+    }
+
+    static string? ToDisplayMediaUrl(string? value)
+    {
+        var mediaUrl = NormalizeMediaUrl(value);
+        if (string.IsNullOrWhiteSpace(mediaUrl))
+            return null;
+
+        if (Uri.TryCreate(mediaUrl, UriKind.Absolute, out _))
+            return null;
+
+        return mediaUrl;
+    }
+
+    static bool IsImageUrl(string? value) =>
+        Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri) &&
+        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }
 
 @* ========== NAVBAR ========== *@
@@ -93,10 +117,21 @@
             {
                 @foreach (var s in dbServices.OrderBy(x => x.SortOrder))
                 {
+                    var serviceIcon = s.Icon?.Trim();
+                    var isImageIcon = IsImageUrl(serviceIcon);
                     <div class="col-md-6 col-lg-3">
                         <div class="card service-card h-100 border-0 shadow-sm">
                             <div class="card-body text-center p-4">
-                                <div class="service-icon mb-3">@s.Icon</div>
+                                <div class="service-icon mb-3">
+                                    @if (isImageIcon)
+                                    {
+                                        <img src="@serviceIcon" alt="@s.Name" class="service-icon-img" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        @serviceIcon
+                                    }
+                                </div>
                                 <h5 class="fw-bold">@s.Name</h5>
                                 <p class="text-muted small">@s.Description</p>
                                 @if (s.Price.HasValue)
@@ -200,30 +235,19 @@
             <div class="row g-4">
                 @foreach (var n in dbNews.OrderByDescending(x => x.PublishedAt).Take(6))
                 {
+                    var newsImageUrl = ToDisplayMediaUrl(n.ImageUrl);
+                    var hasImage = !string.IsNullOrEmpty(newsImageUrl);
                     <div class="col-md-4">
                         <div class="card news-card border-0 shadow-sm h-100">
-                            @if (!string.IsNullOrEmpty(n.ImageUrl))
+                            @if (hasImage)
                             {
-                                <img src="@n.ImageUrl" class="card-img-top" style="height:200px;object-fit:cover;" alt="@n.Title" />
-                            }
-                            else if (!string.IsNullOrEmpty(n.VideoUrl))
-                            {
-                                @if (IsDirectVideo(n.VideoUrl))
-                                {
-                                    <video class="card-img-top" style="height:200px;object-fit:cover;" muted preload="metadata">
-                                        <source src="@n.VideoUrl" type="video/mp4" />
-                                    </video>
-                                }
-                                else
-                                {
-                                    <div class="ratio ratio-16x9">
-                                        <iframe src="@n.VideoUrl" allowfullscreen style="border:0;"></iframe>
-                                    </div>
-                                }
+                                <div class="news-media-frame">
+                                    <img src="@newsImageUrl" alt="@n.Title" class="news-media-image" loading="lazy" />
+                                </div>
                             }
                             else
                             {
-                                <div style="height:200px;background:linear-gradient(135deg,#e0f2fe,#ddd6fe);display:flex;align-items:center;justify-content:center;">
+                                <div class="news-media-placeholder">
                                     <span style="font-size:3rem;">📰</span>
                                 </div>
                             }
@@ -289,7 +313,7 @@
         </div>
         <hr class="border-secondary my-4" />
         <div class="text-center">
-            <span class="text-white-50 small">© 2025 MedUZI Diagnostika Markazi. Barcha huquqlar himoyalangan.</span>
+            <span class="text-white-50 small">© @DateTime.Today.Year MedUZI Diagnostika Markazi. Barcha huquqlar himoyalangan.</span>
         </div>
     </div>
 </footer>

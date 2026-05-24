@@ -3,6 +3,12 @@
     ViewData["Title"] = "Xizmatlar boshqaruvi";
 }
 
+@functions {
+    static bool IsImageUrl(string? value) =>
+        Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri) &&
+        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3>🩺 Xizmatlar boshqaruvi</h3>
     <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createForm">+ Yangi xizmat</button>
@@ -15,19 +21,19 @@
             <form method="post" asp-controller="Manage" asp-action="ServiceCreate">
                 @Html.AntiForgeryToken()
                 <div class="row g-3">
-                    <div class="col-md-1">
-                        <label class="form-label">Icon</label>
-                        <input name="Icon" class="form-control text-center" style="font-size:1.5rem;" />
+                    <div class="col-md-4">
+                        <label class="form-label">Ikonka URL yoki belgi</label>
+                        <input name="Icon" class="form-control" placeholder="https://...png yoki emoji" />
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label class="form-label">Nomi</label>
                         <input name="Name" class="form-control" required />
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Narx (so'm)</label>
                         <input name="Price" type="number" class="form-control" />
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Tartib</label>
                         <input name="SortOrder" type="number" class="form-control" value="0" />
                     </div>
@@ -54,8 +60,19 @@
             <tbody>
                 @foreach (var s in Model)
                 {
+                    var serviceIcon = s.Icon?.Trim();
+                    var isImageIcon = IsImageUrl(serviceIcon);
                     <tr>
-                        <td style="font-size:1.5rem;">@s.Icon</td>
+                        <td class="text-center">
+                            @if (isImageIcon)
+                            {
+                                <img src="@serviceIcon" alt="@s.Name" class="manage-service-icon-img" loading="lazy" />
+                            }
+                            else
+                            {
+                                <span class="manage-service-icon-text">@serviceIcon</span>
+                            }
+                        </td>
                         <td><strong>@s.Name</strong></td>
                         <td class="text-muted small">@s.Description</td>
                         <td>@(s.Price?.ToString("N0") ?? "—") so'm</td>
@@ -85,11 +102,11 @@
                                     @Html.AntiForgeryToken()
                                     <div class="modal-body">
                                         <div class="row g-3">
-                                            <div class="col-md-2">
-                                                <label class="form-label">Icon</label>
-                                                <input name="Icon" value="@s.Icon" class="form-control text-center" style="font-size:1.5rem;" />
+                                            <div class="col-12">
+                                                <label class="form-label">Ikonka</label>
+                                                <input name="Icon" value="@s.Icon" class="form-control" placeholder="https://...png yoki emoji" />
                                             </div>
-                                            <div class="col-md-10">
+                                            <div class="col-12">
                                                 <label class="form-label">Nomi</label>
                                                 <input name="Name" value="@s.Name" class="form-control" required />
                                             </div>

@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<UltrasoundExam> UltrasoundExams => Set<UltrasoundExam>();
     public DbSet<Diagnosis> Diagnoses => Set<Diagnosis>();
     public DbSet<Report> Reports => Set<Report>();
+    public DbSet<BreastUltrasoundProtocol> BreastUltrasoundProtocols => Set<BreastUltrasoundProtocol>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
@@ -31,6 +32,8 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.PasswordHash).IsRequired();
             entity.Property(e => e.Gender).HasMaxLength(20);
+            entity.Property(e => e.CreatedDate)
+                    .HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.PhoneNumber).IsUnique();
             entity.Property(p => p.CreatedAt)
@@ -75,6 +78,36 @@ public class AppDbContext : DbContext
                   .WithOne(p => p.Report)
                   .HasForeignKey<Report>(e => e.ProtocolId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<BreastUltrasoundProtocol>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DoctorUsername).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DoctorName).HasMaxLength(200);
+            entity.Property(e => e.MedicalInstitutionName).HasMaxLength(300);
+            entity.Property(e => e.MedicalInstitutionAddress).HasMaxLength(500);
+            entity.Property(e => e.ProtocolNumber).HasMaxLength(80);
+            entity.Property(e => e.UltrasoundMachine).HasMaxLength(150);
+            entity.Property(e => e.Probe).HasMaxLength(150);
+            entity.Property(e => e.UltrasoundExamNumber).HasMaxLength(80);
+            entity.Property(e => e.Symmetry).HasMaxLength(120);
+            entity.Property(e => e.RightBreastJson).HasColumnType("jsonb");
+            entity.Property(e => e.LeftBreastJson).HasColumnType("jsonb");
+            entity.Property(e => e.LesionJson).HasColumnType("jsonb");
+            entity.Property(e => e.CystsJson).HasColumnType("jsonb");
+            entity.Property(e => e.RegionalLymphNodesJson).HasColumnType("jsonb");
+            entity.Property(e => e.Findings).IsRequired();
+            entity.Property(e => e.Conclusion).IsRequired();
+            entity.Property(e => e.Birads).HasMaxLength(20);
+            entity.HasOne(e => e.UltrasoundExam)
+                  .WithOne()
+                  .HasForeignKey<BreastUltrasoundProtocol>(e => e.UltrasoundExamId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Patient)
+                  .WithMany()
+                  .HasForeignKey(e => e.PatientId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Appointment>(entity =>
@@ -125,7 +158,7 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Description).IsRequired().HasMaxLength(1000);
-            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.Icon).HasMaxLength(1000);
             entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
         });
 

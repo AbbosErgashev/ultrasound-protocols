@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UltrasoundProtocol.Infrastructure.Data;
@@ -11,9 +12,11 @@ using UltrasoundProtocol.Infrastructure.Data;
 namespace UltrasoundProtocol.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523125357_AddBreastUltrasoundProtocols")]
+    partial class AddBreastUltrasoundProtocols
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -465,8 +468,8 @@ namespace UltrasoundProtocol.Infrastructure.Migrations
 
                     b.Property<string>("Icon")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -549,9 +552,6 @@ namespace UltrasoundProtocol.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DateOfBirth")

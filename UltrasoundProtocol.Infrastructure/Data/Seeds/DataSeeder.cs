@@ -32,6 +32,7 @@ public static class DataSeeder
                     PasswordHash = hasher.Hash("Patient@123"),
                     Role = UserRole.User,
                     IsActive = true,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedAt = DateTime.UtcNow
                 },
                 new()
@@ -46,6 +47,7 @@ public static class DataSeeder
                     PasswordHash = hasher.Hash("Patient@123"),
                     Role = UserRole.User,
                     IsActive = true,
+                    CreatedDate = DateTime.UtcNow,
                     CreatedAt = DateTime.UtcNow
                 }
             };

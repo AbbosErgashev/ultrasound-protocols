@@ -3,8 +3,23 @@
     ViewData["Title"] = "Yangiliklar boshqaruvi";
 }
 
+@functions {
+    static string? ToLocalImageUrl(string? value)
+    {
+        var imageUrl = value?.Trim();
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return null;
+
+        if (Uri.TryCreate(imageUrl, UriKind.Absolute, out _))
+            return null;
+
+        imageUrl = imageUrl.Replace("\\", "/").TrimStart('/');
+        return "/" + imageUrl;
+    }
+}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3>📰 Yangiliklar boshqaruvi</h3>
+    <h3>Yangiliklar boshqaruvi</h3>
     <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#createForm">+ Yangi yangilik</button>
 </div>
 
@@ -19,17 +34,9 @@
                         <label class="form-label">Sarlavha</label>
                         <input name="Title" class="form-control" placeholder="Yangilik sarlavhasi" required />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">🖼️ Rasm URL</label>
-                        <input name="ImageUrl" class="form-control" placeholder="https://..." />
-                        <label class="form-label mt-2">yoki fayl yuklash</label>
-                        <input type="file" name="imageFile" class="form-control" accept="image/*" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">🎬 Video URL</label>
-                        <input name="VideoUrl" class="form-control" placeholder="https://youtube.com/embed/..." />
-                        <label class="form-label mt-2">yoki fayl yuklash</label>
-                        <input type="file" name="videoFile" class="form-control" accept="video/*" />
+                    <div class="col-12">
+                        <label class="form-label">Rasm fayli</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*" required />
                     </div>
                     <div class="col-12">
                         <label class="form-label">Qisqa tavsif</label>
@@ -40,7 +47,7 @@
                         <textarea name="Content" class="form-control" rows="5" placeholder="Batafsil yozing..."></textarea>
                     </div>
                     <div class="col-12 d-flex gap-2">
-                        <button type="submit" class="btn btn-success">💾 Saqlash</button>
+                        <button type="submit" class="btn btn-success">Saqlash</button>
                         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#createForm">Bekor qilish</button>
                     </div>
                 </div>
@@ -53,17 +60,25 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
             <thead class="table-light">
-                <tr><th>Sarlavha</th><th>Media</th><th>Muallif</th><th>Sana</th><th>Holat</th><th>Amallar</th></tr>
+                <tr><th>Sarlavha</th><th class="content-image-column">Rasm</th><th>Muallif</th><th>Sana</th><th>Holat</th><th>Amallar</th></tr>
             </thead>
             <tbody>
                 @foreach (var n in Model)
                 {
+                    var newsImageUrl = ToLocalImageUrl(n.ImageUrl);
                     <tr>
                         <td><strong>@n.Title</strong><br /><small class="text-muted">@n.Summary</small></td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(n.ImageUrl)) { <span title="Rasm">🖼️</span> }
-                            @if (!string.IsNullOrEmpty(n.VideoUrl)) { <span title="Video">🎬</span> }
-                            @if (string.IsNullOrEmpty(n.ImageUrl) && string.IsNullOrEmpty(n.VideoUrl)) { <span class="text-muted">—</span> }
+                        <td class="content-image-column">
+                            <div class="content-media-preview">
+                                @if (!string.IsNullOrEmpty(newsImageUrl))
+                                {
+                                    <img src="@newsImageUrl" alt="@n.Title" class="content-media-thumb" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </div>
                         </td>
                         <td>@n.Author</td>
                         <td>@n.CreatedAt.ToString("dd.MM.yyyy")</td>
@@ -74,66 +89,68 @@
                             { <span class="badge bg-secondary">Qoralama</span> }
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal_@n.Id">✏️</button>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal_@n.Id">Edit</button>
                             <form method="post" asp-controller="Manage" asp-action="NewsToggle" asp-route-id="@n.Id" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm @(n.IsPublished ? "btn-outline-warning" : "btn-outline-success") me-1">
-                                    @(n.IsPublished ? "⏸️" : "▶️")
+                                    @(n.IsPublished ? "Pauza" : "Chop etish")
                                 </button>
                             </form>
                             <form method="post" asp-controller="Manage" asp-action="NewsDelete" asp-route-id="@n.Id" class="d-inline"
                                   onsubmit="return confirm('O\'chirishni tasdiqlaysizmi?')">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">🗑️</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger">O'chirish</button>
                             </form>
                         </td>
                     </tr>
-
-                    <div class="modal fade" id="editModal_@n.Id" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary text-white fw-semibold">
-                                    <h5 class="modal-title">Tahrirlash</h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form method="post" asp-controller="Manage" asp-action="NewsEdit" asp-route-id="@n.Id" enctype="multipart/form-data">
-                                    @Html.AntiForgeryToken()
-                                    <div class="modal-body">
-                                        <div class="row g-3">
-                                            <div class="col-12">
-                                                <label class="form-label">Sarlavha</label>
-                                                <input name="Title" value="@n.Title" class="form-control" required />
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Rasm URL</label>
-                                                <input name="ImageUrl" value="@n.ImageUrl" class="form-control" />
-                                                <input type="file" name="imageFile" class="form-control mt-2" accept="image/*" />
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Video URL</label>
-                                                <input name="VideoUrl" value="@n.VideoUrl" class="form-control" />
-                                                <input type="file" name="videoFile" class="form-control mt-2" accept="video/*" />
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label">Qisqa tavsif</label>
-                                                <input name="Summary" value="@n.Summary" class="form-control" />
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label">To'liq mazmun</label>
-                                                <textarea name="Content" class="form-control" rows="5">@n.Content</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
-                                        <button type="submit" class="btn btn-primary">💾 Saqlash</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 }
             </tbody>
         </table>
     </div>
 </div>
+
+@foreach (var n in Model)
+{
+    var newsImageUrl = ToLocalImageUrl(n.ImageUrl);
+    <div class="modal fade" id="editModal_@n.Id" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white fw-semibold">
+                    <h5 class="modal-title">Tahrirlash</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" asp-controller="Manage" asp-action="NewsEdit" asp-route-id="@n.Id" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Sarlavha</label>
+                                <input name="Title" value="@n.Title" class="form-control" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Rasm fayli</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                @if (!string.IsNullOrEmpty(newsImageUrl))
+                                {
+                                    <img src="@newsImageUrl" alt="@n.Title" class="content-modal-media mt-2" loading="lazy" />
+                                }
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Qisqa tavsif</label>
+                                <input name="Summary" value="@n.Summary" class="form-control" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">To'liq mazmun</label>
+                                <textarea name="Content" class="form-control" rows="5">@n.Content</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                        <button type="submit" class="btn btn-primary">Saqlash</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
