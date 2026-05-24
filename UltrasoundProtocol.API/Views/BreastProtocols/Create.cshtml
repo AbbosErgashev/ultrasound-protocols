@@ -1,7 +1,8 @@
 @model BreastProtocolCreateDto
 @{
-    ViewData["Title"] = "Sut bezlari UTT";
+    ViewData["Title"] = "Sut bezlari";
     var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
+    var doctors = (IEnumerable<DoctorProfileDto>)ViewBag.Doctors;
 
     string[] machineOptions = ["Siemens", "Philips", "Mindray", "GE", "Canon", "Chison", "Hitachi", "Supersonic", "Esaote", "Clarius", "Sonoscape", "SIUI", "Boshqa variant"];
     string[] probeOptions = ["Chiziqli L 5-12 MGts", "Chiziqli L 4-9 MGts", "Boshqa variant"];
@@ -30,7 +31,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="mb-1">Sut bezlarining ultratovush tekshiruvi</h3>
+        <h3 class="mb-1">Sut bezlari</h3>
         <div class="text-muted small">Bitta organ tizimi uchun strukturali protokol</div>
     </div>
     <a href="/Protocols" class="btn btn-outline-secondary btn-sm">Protokollar ro'yxati</a>
@@ -73,7 +74,15 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Shifokor</label>
-                    <input asp-for="DoctorName" class="form-control" placeholder="F.I.O." />
+                    <select asp-for="DoctorProfileId" class="form-select" required>
+                        <option value="">Tanlang...</option>
+                        @foreach (var doctor in doctors)
+                        {
+                            var phone = string.IsNullOrWhiteSpace(doctor.Phone) ? "telefon raqami yo'q" : doctor.Phone;
+                            <option value="@doctor.Id">@doctor.FullName - @phone</option>
+                        }
+                    </select>
+                    <span asp-validation-for="DoctorProfileId" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">UZI apparati</label>
@@ -335,7 +344,8 @@
 
     <div class="d-flex justify-content-center gap-2 my-4">
         <button type="submit" class="btn btn-primary px-4">Saqlash</button>
-        <a href="/Protocols" class="btn btn-outline-secondary px-4">Bekor qilish</a>
+        <button type="submit" name="submitAction" value="print" class="btn btn-warning px-4">Chop etish</button>
+        <a href="/Protocols" class="btn btn-danger px-4">Bekor qilish</a>
     </div>
 </form>
 

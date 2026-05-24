@@ -23,8 +23,9 @@ public class ProtocolService : IProtocolService
     {
         _logger.LogDebug("Barcha protokollar so'raldi");
         var protocols = await _unitOfWork.UltrasoundExams.GetAllAsync();
-        await AttachPatientsAsync(protocols);
-        var result = _mapper.Map<IEnumerable<ProtocolDto>>(protocols);
+        var orderedProtocols = protocols.OrderByDescending(p => p.CreatedAt);
+        await AttachPatientsAsync(orderedProtocols);
+        var result = _mapper.Map<IEnumerable<ProtocolDto>>(orderedProtocols);
         _logger.LogInformation("Protokollar ro'yxati: {Count} ta", result.Count());
         return result;
     }
@@ -47,23 +48,9 @@ public class ProtocolService : IProtocolService
         _logger.LogDebug("Bemor protokollari so'raldi: {PatientId}", patientId);
         var protocols = await _unitOfWork.UltrasoundExams
             .FindAsync(p => p.PatientId == patientId);
-        await AttachPatientsAsync(protocols);
-        return _mapper.Map<IEnumerable<ProtocolDto>>(protocols);
-    }
-
-    public async Task<ProtocolDto> CreateAsync(ProtocolCreateDto dto, string doctorUsername)
-    {
-        _logger.LogInformation("Yangi protokol yaratilmoqda: Organ={BodyPart}, Bemor={PatientId}, Shifokor={Doctor}",
-            dto.BodyPart, dto.PatientId, doctorUsername);
-
-        var exam = _mapper.Map<UltrasoundExam>(dto);
-        exam.DoctorUsername = doctorUsername;
-
-        await _unitOfWork.UltrasoundExams.AddAsync(exam);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("Protokol yaratildi: {ProtocolId}, Organ: {BodyPart}", exam.Id, exam.BodyPart);
-        return _mapper.Map<ProtocolDto>(exam);
+        var orderedProtocols = protocols.OrderByDescending(p => p.CreatedAt);
+        await AttachPatientsAsync(orderedProtocols);
+        return _mapper.Map<IEnumerable<ProtocolDto>>(orderedProtocols);
     }
 
     public async Task<ProtocolDto?> UpdateAsync(Guid id, ProtocolUpdateDto dto)

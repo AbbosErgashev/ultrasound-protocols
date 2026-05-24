@@ -19,7 +19,6 @@ public class MappingProfile : Profile
 
         CreateMap<UltrasoundExam, ProtocolDto>()
             .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient == null ? string.Empty : s.Patient.FullName));
-        CreateMap<ProtocolCreateDto, UltrasoundExam>();
 
         CreateMap<Diagnosis, DiagnosisDto>()
             .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient.FullName));
@@ -29,7 +28,7 @@ public class MappingProfile : Profile
         CreateMap<ReportCreateDto, Report>();
 
         CreateMap<Appointment, AppointmentDto>()
-            .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient.FullName));
+            .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient == null ? string.Empty : s.Patient.FullName));
         CreateMap<AppointmentCreateDto, Appointment>();
 
         CreateMap<Notification, NotificationDto>();

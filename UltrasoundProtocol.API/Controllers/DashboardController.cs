@@ -30,6 +30,8 @@ public class DashboardController : Controller
         var userIdClaim = User.FindFirst("UserId")?.Value;
         Guid? userId = Guid.TryParse(userIdClaim, out var uid) ? uid : null;
         var stats = await _statisticsService.GetDashboardAsync(User.Identity?.Name, userId);
+        var services = await _contentService.GetActiveServicesAsync();
+        ViewBag.Services = services.OrderBy(s => s.SortOrder).ThenBy(s => s.Name);
         return View(stats);
     }
 }

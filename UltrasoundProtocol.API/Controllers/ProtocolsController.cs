@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UltrasoundProtocol.Application.DTOs.Protocol;
+using UltrasoundProtocol.Application.Services.Content;
 using UltrasoundProtocol.Application.Services.BreastProtocol;
 using UltrasoundProtocol.Application.Services.Excel;
-using UltrasoundProtocol.Application.Services.Patient;
 using UltrasoundProtocol.Application.Services.Pdf;
 using UltrasoundProtocol.Application.Services.Protocol;
 using UltrasoundProtocol.Domain.Enums;
@@ -14,19 +13,19 @@ namespace UltrasoundProtocol.API.Controllers;
 public class ProtocolsController : Controller
 {
     private readonly IProtocolService _protocolService;
-    private readonly IPatientService _patientService;
     private readonly IPdfService _pdfService;
     private readonly IExcelService _excelService;
     private readonly IBreastProtocolService _breastProtocolService;
+    private readonly IContentService _contentService;
 
-    public ProtocolsController(IProtocolService protocolService, IPatientService patientService,
-        IPdfService pdfService, IExcelService excelService, IBreastProtocolService breastProtocolService)
+    public ProtocolsController(IProtocolService protocolService, IPdfService pdfService,
+        IExcelService excelService, IBreastProtocolService breastProtocolService, IContentService contentService)
     {
         _protocolService = protocolService;
-        _patientService = patientService;
         _pdfService = pdfService;
         _excelService = excelService;
         _breastProtocolService = breastProtocolService;
+        _contentService = contentService;
     }
 
     public async Task<IActionResult> Index(string? search, string? status)
@@ -49,24 +48,8 @@ public class ProtocolsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        ViewBag.Patients = await _patientService.GetAllAsync();
-        return View();
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(ProtocolCreateDto dto)
-    {
-        if (!ModelState.IsValid)
-        {
-            ViewBag.Patients = await _patientService.GetAllAsync();
-            return View(dto);
-        }
-
-        var doctorUsername = User.Identity?.Name ?? "";
-        await _protocolService.CreateAsync(dto, doctorUsername);
-        TempData["Success"] = "Protokol muvaffaqiyatli yaratildi";
-        return RedirectToAction("Index");
+        var services = await _contentService.GetActiveServicesAsync();
+        return View(services.OrderBy(s => s.SortOrder).ThenBy(s => s.Name));
     }
 
     [HttpGet]
@@ -75,7 +58,7 @@ public class ProtocolsController : Controller
         var protocol = await _protocolService.GetByIdAsync(id);
         if (protocol is null) return NotFound();
 
-        var breastProtocol = protocol.BodyPart.Equals("Sut bezlari", StringComparison.OrdinalIgnoreCase)
+        var breastProtocol = IsBreastProtocol(protocol.BodyPart)
             ? await _breastProtocolService.GetPdfDataByExamIdAsync(id)
             : null;
 
@@ -93,4 +76,7 @@ public class ProtocolsController : Controller
         var excel = _excelService.ExportProtocols(protocols);
         return File(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Protokollar.xlsx");
     }
+
+    private static bool IsBreastProtocol(string bodyPart) =>
+        bodyPart.Contains("Sut bez", StringComparison.OrdinalIgnoreCase);
 }

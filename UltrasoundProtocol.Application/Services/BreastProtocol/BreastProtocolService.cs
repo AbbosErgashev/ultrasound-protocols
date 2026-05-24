@@ -23,6 +23,10 @@ public class BreastProtocolService : IBreastProtocolService
 
     public async Task<Guid> CreateAsync(BreastProtocolCreateDto dto, string doctorUsername)
     {
+        var doctor = await _unitOfWork.DoctorProfiles.GetByIdAsync(dto.DoctorProfileId);
+        if (doctor is null || !doctor.IsActive)
+            throw new ArgumentException("Tanlangan shifokor topilmadi", nameof(dto));
+
         var findings = BuildFindings(dto);
         var conclusion = BuildConclusion(dto);
         var recommendations = string.IsNullOrWhiteSpace(dto.Recommendations)
@@ -46,7 +50,7 @@ public class BreastProtocolService : IBreastProtocolService
             UltrasoundExamId = exam.Id,
             PatientId = dto.PatientId,
             DoctorUsername = doctorUsername,
-            DoctorName = Clean(dto.DoctorName),
+            DoctorName = Clean(doctor.FullName),
             MedicalInstitutionName = Clean(dto.MedicalInstitutionName),
             MedicalInstitutionAddress = Clean(dto.MedicalInstitutionAddress),
             ProtocolNumber = Clean(dto.ProtocolNumber),
@@ -72,7 +76,7 @@ public class BreastProtocolService : IBreastProtocolService
         await _unitOfWork.BreastUltrasoundProtocols.AddAsync(breastProtocol);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation("Sut bezlari UTT protokoli yaratildi: {ProtocolId}", breastProtocol.Id);
+        _logger.LogInformation("Sut bezining Ultratovush protokoli yaratildi: {ProtocolId}", breastProtocol.Id);
         return exam.Id;
     }
 

@@ -2,6 +2,33 @@
 @{
     ViewData["Title"] = "Boshqaruv paneli";
     var fullName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? User.Identity?.Name;
+    var services = ((IEnumerable<ServiceItemDto>?)ViewBag.Services)?.ToList() ?? new List<ServiceItemDto>();
+}
+
+@functions {
+    static bool IsImageUrl(string? value) =>
+        Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri) &&
+        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+
+    static bool IsBreastService(string name)
+    {
+        var normalized = name
+            .Replace("'", string.Empty)
+            .Replace("`", string.Empty)
+            .Replace("‘", string.Empty)
+            .Replace("’", string.Empty)
+            .Replace("ʻ", string.Empty);
+
+        return normalized.Contains("Sut bez", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Kokrak bez", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Кукрак без", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Кўкрак без", StringComparison.OrdinalIgnoreCase);
+    }
+
+    static string DisplayServiceName(ServiceItemDto service) =>
+        IsBreastService(service.Name)
+            ? "Sut bezlari"
+            : service.Name;
 }
 
 <h3 class="mb-2">📊 Boshqaruv paneli</h3>
@@ -58,6 +85,78 @@
     </div>
 </div>
 
+@if (services.Any())
+{
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+        <h5 class="mb-0">Yangi protokol</h5>
+        <a href="/Protocols/Create" class="btn btn-sm btn-outline-primary">Barchasi</a>
+    </div>
+    <div class="row g-3 dashboard-service-grid mb-4">
+        @foreach (var service in services)
+        {
+            var serviceIcon = service.Icon?.Trim();
+            var isImageIcon = IsImageUrl(serviceIcon);
+            var isBreastService = IsBreastService(service.Name);
+            var priceText = service.Price.HasValue ? $"{service.Price.Value:N0} so'm" : null;
+
+            <div class="col-md-6 col-xl-4">
+                @if (isBreastService)
+                {
+                    <a href="/BreastProtocols/Create" class="dashboard-service-card dashboard-service-card-active">
+                        <span class="dashboard-service-icon">
+                            @if (isImageIcon)
+                            {
+                                <img src="@serviceIcon" alt="@DisplayServiceName(service)" loading="lazy" />
+                            }
+                            else
+                            {
+                                @serviceIcon
+                            }
+                        </span>
+                        <span class="dashboard-service-body">
+                            <span class="dashboard-service-name">@DisplayServiceName(service)</span>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <span class="dashboard-service-description">@service.Description</span>
+                            }
+                            @if (priceText is not null)
+                            {
+                                <span class="dashboard-service-price">@priceText</span>
+                            }
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <button type="button" class="dashboard-service-card dashboard-service-card-disabled" disabled>
+                        <span class="dashboard-service-icon">
+                            @if (isImageIcon)
+                            {
+                                <img src="@serviceIcon" alt="@DisplayServiceName(service)" loading="lazy" />
+                            }
+                            else
+                            {
+                                @serviceIcon
+                            }
+                        </span>
+                        <span class="dashboard-service-body">
+                            <span class="dashboard-service-name">@DisplayServiceName(service)</span>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <span class="dashboard-service-description">@service.Description</span>
+                            }
+                            @if (priceText is not null)
+                            {
+                                <span class="dashboard-service-price">@priceText</span>
+                            }
+                        </span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+}
+
 @if (Model.MonthlyStats.Count > 0)
 {
     <div class="card">
@@ -81,3 +180,89 @@
         </div>
     </div>
 }
+
+<style>
+    .dashboard-service-card {
+        width: 100%;
+        min-height: 142px;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        border: 1px solid #dbe4ef;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        text-align: left;
+        text-decoration: none;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .dashboard-service-card-active:hover {
+        border-color: #2563eb;
+        box-shadow: 0 12px 28px rgba(37, 99, 235, 0.14);
+        color: #0f172a;
+        transform: translateY(-1px);
+    }
+
+    .dashboard-service-card-disabled {
+        cursor: default;
+        opacity: 0.72;
+    }
+
+    .dashboard-service-icon {
+        width: 50px;
+        height: 50px;
+        flex: 0 0 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #eef6ff;
+        color: #1d4ed8;
+        font-size: 1.5rem;
+        overflow: hidden;
+    }
+
+    .dashboard-service-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .dashboard-service-body {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .dashboard-service-name {
+        font-weight: 700;
+        line-height: 1.25;
+    }
+
+    .dashboard-service-description {
+        color: #64748b;
+        font-size: 0.88rem;
+        line-height: 1.4;
+    }
+
+    .dashboard-service-price {
+        width: fit-content;
+        margin-top: 0.1rem;
+        padding: 0.18rem 0.5rem;
+        border-radius: 999px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 575.98px) {
+        .dashboard-service-card {
+            min-height: auto;
+        }
+    }
+</style>
