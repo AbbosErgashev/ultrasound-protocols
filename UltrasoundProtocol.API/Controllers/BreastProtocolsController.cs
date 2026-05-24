@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UltrasoundProtocol.Application.DTOs.BreastProtocol;
+using UltrasoundProtocol.Application.DTOs.Content;
 using UltrasoundProtocol.Application.Services.BreastProtocol;
+using UltrasoundProtocol.Application.Services.Content;
 using UltrasoundProtocol.Application.Services.Patient;
 
 namespace UltrasoundProtocol.API.Controllers;
@@ -11,19 +13,22 @@ public class BreastProtocolsController : Controller
 {
     private readonly IBreastProtocolService _breastProtocolService;
     private readonly IPatientService _patientService;
+    private readonly IContentService _contentService;
 
     public BreastProtocolsController(
         IBreastProtocolService breastProtocolService,
-        IPatientService patientService)
+        IPatientService patientService,
+        IContentService contentService)
     {
         _breastProtocolService = breastProtocolService;
         _patientService = patientService;
+        _contentService = contentService;
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        ViewBag.Patients = await _patientService.GetAllAsync();
+        await LoadDropdownsAsync();
         return View(new BreastProtocolCreateDto
         {
             ExamDate = DateTime.Today,
@@ -35,21 +40,40 @@ public class BreastProtocolsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(BreastProtocolCreateDto dto)
+    public async Task<IActionResult> Create(BreastProtocolCreateDto dto, string? submitAction)
     {
+        var doctors = (await _contentService.GetActiveDoctorsAsync()).ToList();
+
         if (dto.PatientId == Guid.Empty)
             ModelState.AddModelError(nameof(dto.PatientId), "Bemor tanlanishi shart");
 
+        if (dto.DoctorProfileId == Guid.Empty)
+            ModelState.AddModelError(nameof(dto.DoctorProfileId), "Shifokor tanlanishi shart");
+        else if (!doctors.Any(d => d.Id == dto.DoctorProfileId))
+            ModelState.AddModelError(nameof(dto.DoctorProfileId), "Tanlangan shifokor topilmadi");
+
         if (!ModelState.IsValid)
         {
-            ViewBag.Patients = await _patientService.GetAllAsync();
+            await LoadDropdownsAsync(doctors);
             return View(dto);
         }
 
         var doctorUsername = User.Identity?.Name ?? "";
-        await _breastProtocolService.CreateAsync(dto, doctorUsername);
-        TempData["Success"] = "Sut bezlari UTT protokoli muvaffaqiyatli yaratildi";
+        var protocolId = await _breastProtocolService.CreateAsync(dto, doctorUsername);
+
+        if (string.Equals(submitAction, "print", StringComparison.OrdinalIgnoreCase))
+            return RedirectToAction("ExportPdf", "Protocols", new { id = protocolId });
+
+        TempData["Success"] = "Sut bezining Ultratovush protokoli muvaffaqiyatli yaratildi";
         return RedirectToAction("Index", "Protocols");
+    }
+
+    private async Task LoadDropdownsAsync(IEnumerable<DoctorProfileDto>? doctors = null)
+    {
+        ViewBag.Patients = await _patientService.GetAllAsync();
+        ViewBag.Doctors = (doctors ?? await _contentService.GetActiveDoctorsAsync())
+            .OrderBy(d => d.SortOrder)
+            .ThenBy(d => d.FullName);
     }
 
     private static BreastSideDto CreateDefaultSide() => new()

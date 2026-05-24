@@ -3,10 +3,10 @@ namespace UltrasoundProtocol.Application.DTOs.BreastProtocol;
 public class BreastProtocolCreateDto
 {
     public Guid PatientId { get; set; }
+    public Guid DoctorProfileId { get; set; }
     public string? MedicalInstitutionName { get; set; }
     public string? MedicalInstitutionAddress { get; set; }
     public string? ProtocolNumber { get; set; }
-    public string? DoctorName { get; set; }
     public DateTime ExamDate { get; set; } = DateTime.Today;
     public string? UltrasoundMachine { get; set; }
     public string? Probe { get; set; }

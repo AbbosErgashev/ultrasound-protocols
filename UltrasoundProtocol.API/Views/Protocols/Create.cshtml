@@ -1,77 +1,197 @@
-@model ProtocolCreateDto
+@model IEnumerable<ServiceItemDto>
 @{
     ViewData["Title"] = "Yangi protokol";
-    var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
+    var services = Model?.ToList() ?? new List<ServiceItemDto>();
 }
 
-<h3 class="mb-4">📝 Yangi UZI protokol yaratish</h3>
+@functions {
+    static bool IsImageUrl(string? value) =>
+        Uri.TryCreate(value?.Trim(), UriKind.Absolute, out var uri) &&
+        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 
-<div class="card" style="max-width:700px;">
-    <div class="card-body">
-        <div class="mb-3 p-3 bg-light rounded">
-            <label class="form-label fw-semibold">📋 Shablondan to'ldirish (ixtiyoriy)</label>
-            <select id="templateSelect" class="form-select" onchange="applyTemplate(this.value)">
-                <option value="">Shablonsiz yozish...</option>
-                <option value="liver_normal" data-bodypart="Jigar" data-findings="Jigar o'lchamlari normal chegarada. O'ng bo'lak — 14.5 sm, chap bo'lak — 6.8 sm. Konturlari tekis, parenximasi bir xil, exogenizligi normal. Intragepatik o't yo'llari kengaymagan. Portal vena — 11 mm." data-conclusion="Jigar patologiyasi aniqlanmadi. Norma.">Jigar — Norma</option>
-                <option value="liver_fatty" data-bodypart="Jigar" data-findings="Jigar o'lchamlari kattalashgan. O'ng bo'lak — 17.2 sm. Parenxima exogenizligi diffuz oshgan, tomirlar ko'rinishi yomonlashgan. Jigar konturlari tekis, lekin tuzilishi heterogen." data-conclusion="Diffuz o'zgarishlar — yog'li gepatoz belgisi. Gastroenterolog konsultatsiyasi tavsiya etiladi.">Jigar — Yog'li gepatoz</option>
-                <option value="kidney_normal" data-bodypart="Buyrak" data-findings="O'ng buyrak — 10.5 x 4.8 sm, chap buyrak — 10.8 x 5.0 sm. Konturlari tekis, parenxima qalinligi 1.5-1.8 sm, exogenizligi normal. CLS kengaymagan. Konkrement aniqlanmadi." data-conclusion="Buyraklar patologiyasi aniqlanmadi. Norma.">Buyrak — Norma</option>
-                <option value="kidney_stone" data-bodypart="Buyrak" data-findings="O'ng buyrak CLS sohasida giperexogen tuzilma — 8 mm, akustik soya beradi. CLS 1-darajali kengayish. Parenxima qalinligi saqlangan." data-conclusion="O'ng buyrak nefrolitiazi. Urolog konsultatsiyasi tavsiya etiladi.">Buyrak — Tosh (Nefrolitiaz)</option>
-                <option value="gallbladder_normal" data-bodypart="O't pufagi" data-findings="O't pufagi o'lchamlari — 7.5 x 2.8 sm. Devori qalinligi — 2 mm. Ichida konkrement aniqlanmadi. Choledox — 5 mm." data-conclusion="O't pufagi patologiyasi aniqlanmadi. Norma.">O't pufagi — Norma</option>
-                <option value="gallbladder_stone" data-bodypart="O't pufagi" data-findings="O't pufagi devori qalinlashgan — 4 mm. Ichida 12 mm va 8 mm giperexogen tuzilmalar, akustik soya beradi. Choledox — 6 mm." data-conclusion="O't tosh kasalligi (Xolelityaz). Jarrohlik konsultatsiyasi tavsiya etiladi.">O't pufagi — Tosh</option>
-                <option value="thyroid_normal" data-bodypart="Qalqonsimon bez" data-findings="Qalqonsimon bez o'lchamlari: o'ng bo'lak — 1.8 x 1.6 x 4.5 sm, chap bo'lak — 1.7 x 1.5 x 4.3 sm. Isthmus — 3 mm. Parenxima bir xil, exogenizligi normal. Tugunlar aniqlanmadi." data-conclusion="Qalqonsimon bez patologiyasi aniqlanmadi. Norma.">Qalqonsimon bez — Norma</option>
-                <option value="bladder_normal" data-bodypart="Siydik pufagi" data-findings="Siydik pufagi to'la holatda tekshirildi. Devori tekis, qalinligi — 3 mm. Ichida patologik tuzilma aniqlanmadi. Qoldiq siydik — 15 ml." data-conclusion="Siydik pufagi patologiyasi aniqlanmadi.">Siydik pufagi — Norma</option>
-            </select>
-        </div>
+    static bool IsBreastService(string name)
+    {
+        var normalized = name
+            .Replace("'", string.Empty)
+            .Replace("`", string.Empty)
+            .Replace("‘", string.Empty)
+            .Replace("’", string.Empty)
+            .Replace("ʻ", string.Empty);
 
-        <form method="post" asp-controller="Protocols" asp-action="Create">
-            @Html.AntiForgeryToken()
-            <div class="mb-3">
-                <label class="form-label">Bemor</label>
-                <select name="PatientId" class="form-select" required>
-                    <option value="">Tanlang...</option>
-                    @foreach (var p in patients)
-                    {
-                        <option value="@p.Id">@p.FullName — @p.PhoneNumber</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tekshirilgan organ</label>
-                <input id="bodyPartField" name="BodyPart" class="form-control"
-                       placeholder="masalan: Jigar, Buyrak, Qorin bo'shlig'i" required />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tekshiruv sanasi</label>
-                <input name="ExamDate" type="date" class="form-control"
-                       value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Topilmalar (Findings)</label>
-                <textarea id="findingsField" name="Findings" class="form-control" rows="4"
-                          placeholder="UZI tekshiruvi natijalarini kiriting..."></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Xulosa (Conclusion)</label>
-                <textarea id="conclusionField" name="Conclusion" class="form-control" rows="3"
-                          placeholder="Yakuniy xulosa..."></textarea>
-            </div>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">💾 Saqlash</button>
-                <a href="/Protocols" class="btn btn-outline-secondary">Bekor qilish</a>
-            </div>
-        </form>
+        return normalized.Contains("Sut bez", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Kokrak bez", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Кукрак без", StringComparison.OrdinalIgnoreCase) ||
+            normalized.Contains("Кўкрак без", StringComparison.OrdinalIgnoreCase);
+    }
+
+    static string DisplayServiceName(ServiceItemDto service) =>
+        IsBreastService(service.Name)
+            ? "Sut bezlari"
+            : service.Name;
+}
+
+<div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <h3 class="mb-1">Yangi protokol</h3>
+        <div class="text-muted">Aktiv xizmatlardan protokol turini tanlang.</div>
     </div>
+    <a href="/Protocols" class="btn btn-outline-secondary">Protokollar ro'yxati</a>
 </div>
 
-@section Scripts {
-<script>
-function applyTemplate(key) {
-    var sel = document.getElementById('templateSelect');
-    var opt = sel.options[sel.selectedIndex];
-    if (!key) return;
-    document.getElementById('bodyPartField').value = opt.dataset.bodypart || '';
-    document.getElementById('findingsField').value = opt.dataset.findings || '';
-    document.getElementById('conclusionField').value = opt.dataset.conclusion || '';
+@if (!services.Any())
+{
+    <div class="alert alert-info">Aktiv xizmatlar topilmadi.</div>
 }
-</script>
+else
+{
+    <div class="row g-3 protocol-service-grid">
+        @foreach (var service in services)
+        {
+            var serviceIcon = service.Icon?.Trim();
+            var isImageIcon = IsImageUrl(serviceIcon);
+            var isBreastService = IsBreastService(service.Name);
+            var priceText = service.Price.HasValue ? $"{service.Price.Value:N0} so'm" : null;
+
+            <div class="col-md-6 col-xl-4">
+                @if (isBreastService)
+                {
+                    <a href="/BreastProtocols/Create" class="protocol-service-card protocol-service-card-active">
+                        <span class="protocol-service-icon">
+                            @if (isImageIcon)
+                            {
+                                <img src="@serviceIcon" alt="@DisplayServiceName(service)" loading="lazy" />
+                            }
+                            else
+                            {
+                                @serviceIcon
+                            }
+                        </span>
+                        <span class="protocol-service-body">
+                            <span class="protocol-service-name">@DisplayServiceName(service)</span>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <span class="protocol-service-description">@service.Description</span>
+                            }
+                            @if (priceText is not null)
+                            {
+                                <span class="protocol-service-price">@priceText</span>
+                            }
+                        </span>
+                    </a>
+                }
+                else
+                {
+                    <button type="button" class="protocol-service-card protocol-service-card-disabled" disabled>
+                        <span class="protocol-service-icon">
+                            @if (isImageIcon)
+                            {
+                                <img src="@serviceIcon" alt="@DisplayServiceName(service)" loading="lazy" />
+                            }
+                            else
+                            {
+                                @serviceIcon
+                            }
+                        </span>
+                        <span class="protocol-service-body">
+                            <span class="protocol-service-name">@DisplayServiceName(service)</span>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <span class="protocol-service-description">@service.Description</span>
+                            }
+                            @if (priceText is not null)
+                            {
+                                <span class="protocol-service-price">@priceText</span>
+                            }
+                        </span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
 }
+
+<style>
+    .protocol-service-card {
+        width: 100%;
+        min-height: 150px;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.1rem;
+        border: 1px solid #dbe4ef;
+        border-radius: 8px;
+        background: #fff;
+        color: #0f172a;
+        text-align: left;
+        text-decoration: none;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .protocol-service-card-active:hover {
+        border-color: #2563eb;
+        box-shadow: 0 12px 28px rgba(37, 99, 235, 0.14);
+        color: #0f172a;
+        transform: translateY(-1px);
+    }
+
+    .protocol-service-card-disabled {
+        cursor: default;
+        opacity: 0.72;
+    }
+
+    .protocol-service-icon {
+        width: 54px;
+        height: 54px;
+        flex: 0 0 54px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #eef6ff;
+        color: #1d4ed8;
+        font-size: 1.6rem;
+        overflow: hidden;
+    }
+
+    .protocol-service-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .protocol-service-body {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .protocol-service-name {
+        font-weight: 700;
+        line-height: 1.25;
+    }
+
+    .protocol-service-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .protocol-service-price {
+        width: fit-content;
+        margin-top: 0.15rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: #ecfdf5;
+        color: #047857;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 575.98px) {
+        .protocol-service-card {
+            min-height: auto;
+        }
+    }
+</style>

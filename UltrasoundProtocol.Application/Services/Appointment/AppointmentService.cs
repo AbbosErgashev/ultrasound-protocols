@@ -23,12 +23,14 @@ public class AppointmentService : IAppointmentService
     {
         _logger.LogDebug("Barcha randevular so'raldi");
         var items = await _unitOfWork.Appointments.GetAllAsync();
+        await AttachPatientsAsync(items);
         return _mapper.Map<IEnumerable<AppointmentDto>>(items);
     }
 
     public async Task<IEnumerable<AppointmentDto>> GetByPatientIdAsync(Guid patientId)
     {
         var items = await _unitOfWork.Appointments.FindAsync(a => a.PatientId == patientId);
+        await AttachPatientsAsync(items);
         return _mapper.Map<IEnumerable<AppointmentDto>>(items);
     }
 
@@ -37,6 +39,7 @@ public class AppointmentService : IAppointmentService
         var today = DateTime.UtcNow.Date;
         var items = await _unitOfWork.Appointments.FindAsync(
             a => a.AppointmentDate.Date == today && !a.IsCancelled);
+        await AttachPatientsAsync(items);
         return _mapper.Map<IEnumerable<AppointmentDto>>(items);
     }
 
@@ -47,6 +50,7 @@ public class AppointmentService : IAppointmentService
         var entity = _mapper.Map<AppointmentEntity>(dto);
         await _unitOfWork.Appointments.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
+        await AttachPatientsAsync([entity]);
         _logger.LogInformation("Randevu yaratildi: {AppointmentId}", entity.Id);
         return _mapper.Map<AppointmentDto>(entity);
     }
@@ -71,5 +75,26 @@ public class AppointmentService : IAppointmentService
         _unitOfWork.Appointments.Update(entity);
         await _unitOfWork.SaveChangesAsync();
         return true;
+    }
+
+    private async Task AttachPatientsAsync(IEnumerable<AppointmentEntity> appointments)
+    {
+        var appointmentList = appointments.ToList();
+        if (appointmentList.Count == 0)
+            return;
+
+        var patientIds = appointmentList
+            .Select(a => a.PatientId)
+            .Distinct()
+            .ToArray();
+
+        var patients = (await _unitOfWork.Users.FindAsync(u => patientIds.Contains(u.Id)))
+            .ToDictionary(patient => patient.Id);
+
+        foreach (var appointment in appointmentList)
+        {
+            if (appointment.Patient is null && patients.TryGetValue(appointment.PatientId, out var patient))
+                appointment.Patient = patient;
+        }
     }
 }
