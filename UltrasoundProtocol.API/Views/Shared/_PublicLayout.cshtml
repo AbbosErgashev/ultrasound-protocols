@@ -5,11 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — MedUZI Diagnostika</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/app.css?v=20260524-1" />
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('meduzi-theme') === 'dark' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (_) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="/app.css?v=20260525-1" />
 </head>
-<body>
+<body class="public-layout">
     @RenderBody()
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/site.js?v=20260525-1"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

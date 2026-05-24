@@ -5,16 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — MedUZI</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/app.css?v=20260524-1" />
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('meduzi-theme') === 'dark' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (_) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="/app.css?v=20260525-1" />
     <style>
-        body { display: flex; min-height: 100vh; background: #f8fafc; }
-        .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg,#1e3a5f 0%,#2d5986 100%); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
+        body { display: flex; min-height: 100vh; background: var(--app-bg); color: var(--app-text); }
+        .sidebar { width: 260px; min-height: 100vh; background: var(--app-sidebar-bg); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
         .sidebar-brand { padding: 1.2rem 1.5rem; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 0.6rem 1.5rem; border-radius: 0; transition: background 0.15s; display: flex; align-items: center; gap: 0.5rem; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); color: #fff; }
         .sidebar .nav-section { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); padding: 1rem 1.5rem 0.3rem; }
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .topbar { background: var(--app-surface); border-bottom: 1px solid var(--app-border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
         .page-body { flex: 1; padding: 1.5rem; overflow-y: auto; }
         .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; }
     </style>
@@ -79,6 +89,9 @@
                     };
                 }
                 @* <span class="badge @roleColor role-badge">@role</span> *@
+                <button type="button" class="theme-toggle" data-theme-toggle aria-label="Tun rejimini yoqish" title="Tun rejimini yoqish">
+                    <span data-theme-toggle-icon aria-hidden="true">&#9728;</span>
+                </button>
                 <span class="text-dark fw-semibold small">@User.Identity!.Name</span>
                 <a href="/Auth/Logout" class="btn btn-sm btn-outline-danger">Chiqish</a>
             </div>
@@ -108,6 +121,7 @@ else
 }
 
 <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/site.js?v=20260525-1"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

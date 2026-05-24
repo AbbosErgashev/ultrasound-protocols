@@ -5,10 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kirish — MedUZI</title>
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/app.css?v=20260524-1" />
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('meduzi-theme') === 'dark' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (_) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="/app.css?v=20260525-1" />
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
+<body class="app-login-body bg-light d-flex align-items-center justify-content-center" style="min-height:100vh;">
+    <button type="button" class="theme-toggle theme-toggle-floating" data-theme-toggle aria-label="Tun rejimini yoqish" title="Tun rejimini yoqish">
+        <span data-theme-toggle-icon aria-hidden="true">&#9728;</span>
+    </button>
     @RenderBody()
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/site.js?v=20260525-1"></script>
 </body>
 </html>
