@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using UltrasoundProtocol.Application.Mappings;
-using UltrasoundProtocol.Application.Services.AI;
 using UltrasoundProtocol.Application.Services.Appointment;
 using UltrasoundProtocol.Application.Services.Audit;
 using UltrasoundProtocol.Application.Services.Auth;
@@ -33,17 +32,11 @@ public static class ApplicationServiceExtensions
             configuration.GetSection("StaticUsers"));
         services.Configure<EmailSettings>(
             configuration.GetSection("EmailSettings"));
-        services.Configure<AISettings>(
-            configuration.GetSection("AISettings"));
-
         // AutoMapper
         services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
         // FluentValidation
         services.AddValidatorsFromAssemblyContaining<MappingProfile>();
-
-        // HttpClient for Claude AI
-        services.AddHttpClient<IAIAnalysisService, AIAnalysisService>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();

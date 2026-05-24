@@ -90,25 +90,6 @@ public class ProtocolService : IProtocolService
         return _mapper.Map<ProtocolDto>(exam);
     }
 
-    public async Task<bool> SaveAIAnalysisAsync(Guid protocolId, string aiResult)
-    {
-        _logger.LogInformation("AI tahlil natijasi saqlanmoqda: {ProtocolId}", protocolId);
-        var exam = await _unitOfWork.UltrasoundExams.GetByIdAsync(protocolId);
-        if (exam is null)
-        {
-            _logger.LogWarning("AI saqlash uchun protokol topilmadi: {ProtocolId}", protocolId);
-            return false;
-        }
-
-        exam.AIAnalysisResult = aiResult;
-        exam.UpdatedAt = DateTime.UtcNow;
-
-        _unitOfWork.UltrasoundExams.Update(exam);
-        await _unitOfWork.SaveChangesAsync();
-        _logger.LogInformation("AI tahlil saqlandi: {ProtocolId}", protocolId);
-        return true;
-    }
-
     private async Task AttachPatientsAsync(IEnumerable<UltrasoundExam> protocols)
     {
         var protocolList = protocols.ToList();

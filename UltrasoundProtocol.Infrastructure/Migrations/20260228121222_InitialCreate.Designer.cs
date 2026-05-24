@@ -248,8 +248,6 @@ namespace UltrasoundProtocol.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AIAnalysisResult")
-                        .HasColumnType("text");
 
                     b.Property<string>("BodyPart")
                         .IsRequired()
