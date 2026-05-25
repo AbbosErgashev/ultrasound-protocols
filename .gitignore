@@ -416,6 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-/UltrasoundProtocol.API/appsettings.Development.json
-/UltrasoundProtocol.API/appsettings.json
+# /UltrasoundProtocol.API/appsettings.Development.json
+# /UltrasoundProtocol.API/appsettings.json
 /database_exportdata
