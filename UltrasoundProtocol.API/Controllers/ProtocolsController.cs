@@ -42,7 +42,31 @@ public class ProtocolsController : Controller
 
         ViewBag.Search = search;
         ViewBag.Status = status;
+        ViewBag.PendingPrintProtocolId =
+            TempData["PendingPrintProtocolId"] is string pendingPrintProtocolId &&
+            Guid.TryParse(pendingPrintProtocolId, out _)
+                ? pendingPrintProtocolId
+                : null;
+
         return View(protocols);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeStatus(Guid id, ProtocolStatus status, string? search, string? currentStatus)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            TempData["Error"] = "Noto'g'ri protokol holati tanlandi";
+            return RedirectToAction(nameof(Index), new { search, status = currentStatus });
+        }
+
+        var updated = await _protocolService.UpdateStatusAsync(id, status);
+        TempData[updated ? "Success" : "Error"] = updated
+            ? "Protokol holati yangilandi"
+            : "Protokol topilmadi";
+
+        return RedirectToAction(nameof(Index), new { search, status = currentStatus });
     }
 
     [HttpGet]

@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Randevular";
     var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
-    var doctorUsername = ViewBag.DoctorUsername as string ?? "";
+    var doctors = (IEnumerable<DoctorProfileDto>)ViewBag.Doctors;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -15,9 +15,8 @@
         <div class="card-body">
             <form method="post" asp-controller="Appointments" asp-action="Create">
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="DoctorUsername" value="@doctorUsername" />
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Bemor</label>
                         <select name="PatientId" class="form-select" required>
                             <option value="">Tanlang...</option>
@@ -28,11 +27,22 @@
                         </select>
                     </div>
                     <div class="col-md-3">
+                        <label class="form-label">Shifokor</label>
+                        <select name="DoctorProfileId" class="form-select" required>
+                            <option value="">Tanlang...</option>
+                            @foreach (var doctor in doctors)
+                            {
+                                var phone = string.IsNullOrWhiteSpace(doctor.Phone) ? "telefon raqami yo'q" : doctor.Phone;
+                                <option value="@doctor.Id">@doctor.FullName - @phone</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
                         <label class="form-label">Sana va vaqt</label>
                         <input name="AppointmentDate" type="datetime-local" class="form-control"
                                value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")" required />
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Izoh</label>
                         <input name="Notes" class="form-control" placeholder="Izoh..." />
                     </div>
@@ -59,7 +69,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var a in Model.OrderByDescending(x => x.AppointmentDate))
+                @foreach (var a in Model)
                 {
                     <tr>
                         <td>@a.PatientName</td>

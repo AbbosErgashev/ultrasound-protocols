@@ -70,7 +70,7 @@ public class ExcelService : IExcelService
             ws.Cell(row, 1).Value = p.PatientName;
             ws.Cell(row, 2).Value = p.BodyPart;
             ws.Cell(row, 3).Value = p.ExamDate.ToString("dd.MM.yyyy");
-            ws.Cell(row, 4).Value = p.DoctorUsername;
+            ws.Cell(row, 4).Value = p.DoctorDisplayName;
             ws.Cell(row, 5).Value = p.Findings;
             ws.Cell(row, 6).Value = p.Conclusion;
             ws.Cell(row, 7).Value = p.Status.ToString();

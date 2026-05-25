@@ -3,6 +3,7 @@
     ViewData["Title"] = "UZI Protokollar";
     string? search = ViewBag.Search;
     string? status = ViewBag.Status;
+    string? pendingPrintProtocolId = ViewBag.PendingPrintProtocolId;
 }
 
 @functions {
@@ -12,6 +13,14 @@
         ProtocolStatus.Completed => "bg-success",
         ProtocolStatus.Archived => "bg-dark",
         _ => "bg-light text-dark"
+    };
+
+    static string GetStatusLabel(ProtocolStatus s) => s switch {
+        ProtocolStatus.Draft => "Qoralama",
+        ProtocolStatus.Active => "Faol",
+        ProtocolStatus.Completed => "Yakunlangan",
+        ProtocolStatus.Archived => "Arxivlangan",
+        _ => s.ToString()
     };
 }
 
@@ -80,8 +89,35 @@ else
                             <td>@p.PatientName</td>
                             <td><strong>@p.BodyPart</strong></td>
                             <td>@p.ExamDate.ToString("dd.MM.yyyy")</td>
-                            <td>@p.DoctorUsername</td>
-                            <td><span class="badge @GetStatusBadge(p.Status)">@p.Status</span></td>
+                            <td>@p.DoctorDisplayName</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="badge @GetStatusBadge(p.Status) border-0 dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        @GetStatusLabel(p.Status)
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @foreach (var option in Enum.GetValues<ProtocolStatus>())
+                                        {
+                                            <li>
+                                                <form asp-controller="Protocols" asp-action="ChangeStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@p.Id" />
+                                                    <input type="hidden" name="status" value="@option" />
+                                                    <input type="hidden" name="search" value="@search" />
+                                                    <input type="hidden" name="currentStatus" value="@status" />
+                                                    <button type="submit"
+                                                            class="dropdown-item @(option == p.Status ? "active" : "")">
+                                                        @GetStatusLabel(option)
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
                             <td class="d-flex gap-1">
                                 <a href="/Protocols/ExportPdf/@p.Id" class="btn btn-sm btn-outline-danger" title="PDF">📄</a>
                             </td>
@@ -91,4 +127,18 @@ else
             </table>
         </div>
     </div>
+}
+
+@section Scripts {
+    @if (!string.IsNullOrWhiteSpace(pendingPrintProtocolId))
+    {
+        <script>
+            (() => {
+                const downloadUrl = '@Url.Action("ExportPdf", "Protocols", new { id = pendingPrintProtocolId })';
+                window.setTimeout(() => {
+                    window.location.assign(downloadUrl);
+                }, 300);
+            })();
+        </script>
+    }
 }

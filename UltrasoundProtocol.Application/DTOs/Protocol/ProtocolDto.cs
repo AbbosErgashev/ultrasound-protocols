@@ -8,6 +8,8 @@ public class ProtocolDto
     public Guid PatientId { get; set; }
     public string PatientName { get; set; } = string.Empty;
     public string DoctorUsername { get; set; } = string.Empty;
+    public string? DoctorName { get; set; }
+    public string DoctorDisplayName => string.IsNullOrWhiteSpace(DoctorName) ? DoctorUsername : DoctorName;
     public string BodyPart { get; set; } = string.Empty;
     public DateTime ExamDate { get; set; }
     public string Findings { get; set; } = string.Empty;
