@@ -3,25 +3,21 @@ using Microsoft.Extensions.Options;
 using UltrasoundProtocol.Application.DTOs.Auth;
 using UltrasoundProtocol.Application.Settings;
 using UltrasoundProtocol.Domain.Interfaces;
-using UltrasoundProtocol.Infrastructure.Security;
 
 namespace UltrasoundProtocol.Application.Services.Auth;
 
 public class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly PasswordHasher _passwordHasher;
     private readonly StaticUserSettings _staticUsers;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IUnitOfWork unitOfWork,
-        PasswordHasher passwordHasher,
         IOptions<StaticUserSettings> staticUsers,
         ILogger<AuthService> logger)
     {
         _unitOfWork = unitOfWork;
-        _passwordHasher = passwordHasher;
         _staticUsers = staticUsers.Value;
         _logger = logger;
     }
@@ -50,7 +46,7 @@ public class AuthService : IAuthService
             return null;
         }
 
-        if (!_passwordHasher.Verify(request.Password, user.PasswordHash))
+        if (request.Password != user.PasswordHash)
         {
             _logger.LogWarning("Noto'g'ri parol: {Username} (UserId: {UserId})", request.Username, user.Id);
             return null;

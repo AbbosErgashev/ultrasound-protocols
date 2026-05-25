@@ -3,40 +3,48 @@
     ViewData["Title"] = "Klinika statistikasi";
 }
 
-<h3 class="mb-4">📈 Klinika statistikasi</h3>
+<h3 class="mb-4">Klinika statistikasi</h3>
 
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="card text-bg-primary">
-            <div class="card-body text-center">
-                <h1 class="fw-bold">@Model.TotalPatients</h1>
-                <p class="mb-0">Jami bemorlar</p>
+        <a asp-controller="Patients" asp-action="Index" class="stat-card-link">
+            <div class="card text-bg-primary h-100">
+                <div class="card-body text-center">
+                    <h1 class="fw-bold">@Model.TotalPatients</h1>
+                    <p class="mb-0">Jami bemorlar</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3">
-        <div class="card text-bg-success">
-            <div class="card-body text-center">
-                <h1 class="fw-bold">@Model.TotalProtocols</h1>
-                <p class="mb-0">Jami protokollar</p>
+        <a asp-controller="Protocols" asp-action="Index" class="stat-card-link">
+            <div class="card text-bg-success h-100">
+                <div class="card-body text-center">
+                    <h1 class="fw-bold">@Model.TotalProtocols</h1>
+                    <p class="mb-0">Jami protokollar</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3">
-        <div class="card text-bg-info">
-            <div class="card-body text-center">
-                <h1 class="fw-bold">@Model.ActiveProtocols</h1>
-                <p class="mb-0">Faol protokollar</p>
+        <a asp-controller="Protocols" asp-action="Index" asp-route-status="Active" class="stat-card-link">
+            <div class="card text-bg-info h-100">
+                <div class="card-body text-center">
+                    <h1 class="fw-bold">@Model.ActiveProtocols</h1>
+                    <p class="mb-0">Faol protokollar</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3">
-        <div class="card text-bg-warning">
-            <div class="card-body text-center">
-                <h1 class="fw-bold">@Model.TodayAppointments</h1>
-                <p class="mb-0">Bugungi uchrashuvlar</p>
+        <a asp-controller="Appointments" asp-action="Today" class="stat-card-link">
+            <div class="card text-bg-warning h-100">
+                <div class="card-body text-center">
+                    <h1 class="fw-bold">@Model.TodayAppointments</h1>
+                    <p class="mb-0">Bugungi uchrashuvlar</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -67,3 +75,22 @@
         }
     </div>
 </div>
+
+<style>
+    .stat-card-link {
+        color: inherit;
+        display: block;
+        height: 100%;
+        text-decoration: none;
+    }
+
+    .stat-card-link .card {
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .stat-card-link:hover .card,
+    .stat-card-link:focus-visible .card {
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        transform: translateY(-2px);
+    }
+</style>

@@ -1,6 +1,9 @@
 @model IEnumerable<PatientDto>
 @{
     ViewData["Title"] = "Bemorlar ro'yxati";
+    string? search = ViewBag.Search;
+    string? gender = ViewBag.Gender;
+    string? status = ViewBag.Status;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -11,9 +14,45 @@
     </div>
 </div>
 
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" asp-controller="Patients" asp-action="Index">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input name="search" value="@search" class="form-control form-control-sm"
+                           placeholder="рџ”Ќ Ism, login, telefon qidiring..." />
+                </div>
+                <div class="col-md-2">
+                    <select name="gender" class="form-select form-select-sm">
+                        <option value="">Jinsi: barchasi</option>
+                        <option value="Erkak" selected="@(gender=="Erkak")">Erkak</option>
+                        <option value="Ayol" selected="@(gender=="Ayol")">Ayol</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">Holat: barchasi</option>
+                        <option value="Active" selected="@(status=="Active")">Faol</option>
+                        <option value="Inactive" selected="@(status=="Inactive")">Nofaol</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Qidirish</button>
+                        <a asp-controller="Patients" asp-action="Index" class="btn btn-sm btn-outline-secondary">Filtrlarni tozalash</a>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <span class="text-muted small">@Model.Count() ta natija</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @if (!Model.Any())
 {
-    <div class="alert alert-info">Hozircha bemorlar yo'q.</div>
+    <div class="alert alert-info">Natija topilmadi.</div>
 }
 else
 {
@@ -82,6 +121,9 @@ else
                 <form method="post" asp-controller="Patients" asp-action="ChangeCredentials">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" id="credPatientId" />
+                    <input type="hidden" name="search" value="@search" />
+                    <input type="hidden" name="gender" value="@gender" />
+                    <input type="hidden" name="status" value="@status" />
                     <div class="modal-body">
                         <p>Bemor: <strong id="credPatientName"></strong></p>
                         <div class="mb-3">

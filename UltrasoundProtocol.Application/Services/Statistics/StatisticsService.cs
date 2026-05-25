@@ -22,8 +22,9 @@ public class StatisticsService : IStatisticsService
         var allPatients = await _unitOfWork.Users
             .FindAsync(u => u.Role == UserRole.User);
         var allProtocols = await _unitOfWork.UltrasoundExams.GetAllAsync();
+        var today = DateTime.Today;
         var todayAppointments = await _unitOfWork.Appointments
-            .FindAsync(a => a.AppointmentDate.Date == DateTime.UtcNow.Date);
+            .FindAsync(a => a.AppointmentDate.Date == today && !a.IsCancelled);
 
         int unread = 0;
         if (userId.HasValue)

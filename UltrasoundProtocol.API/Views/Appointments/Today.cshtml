@@ -1,0 +1,103 @@
+@model IEnumerable<AppointmentDto>
+@{
+    ViewData["Title"] = "Bugungi uchrashuvlar";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+@functions {
+    static string StatusBadge(AppointmentDto appointment)
+    {
+        if (appointment.IsCancelled) return "bg-danger";
+        if (appointment.IsConfirmed) return "bg-success";
+        return "bg-warning text-dark";
+    }
+
+    static string StatusText(AppointmentDto appointment)
+    {
+        if (appointment.IsCancelled) return "Bekor qilingan";
+        if (appointment.IsConfirmed) return "Tasdiqlangan";
+        return "Kutilmoqda";
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-1">Bugungi uchrashuvlar</h3>
+        <div class="text-muted">@DateTime.Today.ToString("dd.MM.yyyy") sanasidagi bekor qilinmagan uchrashuvlar</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Statistics" asp-action="Index" class="btn btn-outline-secondary">Statistikaga qaytish</a>
+        <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary">Barcha uchrashuvlar</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Bugun uchun uchrashuvlar topilmadi.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Bemor</th>
+                        <th>Aloqa</th>
+                        <th>Sana va vaqt</th>
+                        <th>Shifokor</th>
+                        <th>Masala / izoh</th>
+                        <th>Holat</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var appointment in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@appointment.PatientName</strong>
+                            </td>
+                            <td>
+                                <div>@(string.IsNullOrWhiteSpace(appointment.PatientPhoneNumber) ? "Telefon kiritilmagan" : appointment.PatientPhoneNumber)</div>
+                                @if (!string.IsNullOrWhiteSpace(appointment.PatientEmail))
+                                {
+                                    <div class="text-muted small">@appointment.PatientEmail</div>
+                                }
+                            </td>
+                            <td>@appointment.AppointmentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@appointment.DoctorUsername</td>
+                            <td>@(string.IsNullOrWhiteSpace(appointment.Notes) ? "Izoh kiritilmagan" : appointment.Notes)</td>
+                            <td>
+                                <span class="badge @StatusBadge(appointment)">
+                                    @StatusText(appointment)
+                                </span>
+                            </td>
+                            <td>
+                                @if (!appointment.IsConfirmed && !appointment.IsCancelled)
+                                {
+                                    <form method="post" asp-controller="Appointments" asp-action="Confirm"
+                                          asp-route-id="@appointment.Id" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="btn btn-sm btn-success me-1">Tasdiqlash</button>
+                                    </form>
+                                    <form method="post" asp-controller="Appointments" asp-action="Cancel"
+                                          asp-route-id="@appointment.Id" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Bekor qilish</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Amal yo'q</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

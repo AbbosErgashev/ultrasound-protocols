@@ -18,9 +18,32 @@ public class PatientsController : Controller
         _excelService = excelService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search, string? gender, string? status)
     {
         var patients = await _patientService.GetAllAsync();
+
+        if (!string.IsNullOrWhiteSpace(search))
+            patients = patients.Where(p =>
+                p.FullName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                p.Username.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                p.PhoneNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (p.Email?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        if (!string.IsNullOrWhiteSpace(gender))
+            patients = patients.Where(p => p.Gender.Equals(gender, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            if (status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                patients = patients.Where(p => p.IsActive);
+            else if (status.Equals("Inactive", StringComparison.OrdinalIgnoreCase))
+                patients = patients.Where(p => !p.IsActive);
+        }
+
+        ViewBag.Search = search;
+        ViewBag.Gender = gender;
+        ViewBag.Status = status;
+
         return View(patients);
     }
 
@@ -56,11 +79,17 @@ public class PatientsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "ChiefDoctor")]
-    public async Task<IActionResult> ChangeCredentials(Guid id, string newUsername, string newPassword)
+    public async Task<IActionResult> ChangeCredentials(
+        Guid id,
+        string newUsername,
+        string newPassword,
+        string? search,
+        string? gender,
+        string? status)
     {
         await _patientService.ChangeCredentialsAsync(id, newUsername, newPassword);
         TempData["Success"] = "Kirish ma'lumotlari yangilandi";
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { search, gender, status });
     }
 
     [HttpGet]

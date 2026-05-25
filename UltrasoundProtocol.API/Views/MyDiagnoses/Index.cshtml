@@ -1,38 +1,168 @@
 @model IEnumerable<ProtocolDto>
 @{
     ViewData["Title"] = "Mening tashxislarim";
+    var protocols = Model?.ToList() ?? new List<ProtocolDto>();
 }
 
 @functions {
-    static string GetBadge(ProtocolStatus s) => s switch {
-        ProtocolStatus.Draft => "bg-secondary",
-        ProtocolStatus.Active => "bg-primary",
-        ProtocolStatus.Completed => "bg-success",
-        ProtocolStatus.Archived => "bg-dark",
-        _ => "bg-light text-dark"
-    };
-}
-
-<h3 class="mb-4">🩺 Mening UZI tekshiruvlarim</h3>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">Hozircha tekshiruvlar yo'q.</div>
-}
-else
-{
-    @foreach (var p in Model)
+    sealed class FindingRow
     {
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
-                <span><strong>@p.BodyPart</strong> — @p.ExamDate.ToString("dd.MM.yyyy")</span>
-                <span class="badge @GetBadge(p.Status)">@p.Status</span>
-            </div>
-            <div class="card-body">
-                <p><strong>Topilmalar:</strong> @p.Findings</p>
-                <p><strong>Xulosa:</strong> @p.Conclusion</p>
-                <p class="text-muted mb-0"><small>Shifokor: @p.DoctorDisplayName</small></p>
-            </div>
-        </div>
+        public FindingRow(string label, string value)
+        {
+            Label = label;
+            Value = value;
+        }
+
+        public string Label { get; }
+        public string Value { get; }
+    }
+
+    static string GetStatusClass(ProtocolStatus s) => s switch {
+        ProtocolStatus.Draft => "status-draft",
+        ProtocolStatus.Active => "status-active",
+        ProtocolStatus.Completed => "status-completed",
+        ProtocolStatus.Archived => "status-archived",
+        _ => "status-draft"
+    };
+
+    static string GetStatusText(ProtocolStatus s) => s switch {
+        ProtocolStatus.Draft => "Qoralama",
+        ProtocolStatus.Active => "Jarayonda",
+        ProtocolStatus.Completed => "Yakunlangan",
+        ProtocolStatus.Archived => "Arxivlangan",
+        _ => s.ToString()
+    };
+
+    static IReadOnlyList<FindingRow> BuildFindingRows(string? findings)
+    {
+        if (string.IsNullOrWhiteSpace(findings))
+            return Array.Empty<FindingRow>();
+
+        return findings
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(part =>
+            {
+                var text = part.Trim().Trim('.');
+                var separator = text.IndexOf(" - ", StringComparison.Ordinal);
+                var separatorLength = 3;
+
+                if (separator < 0)
+                {
+                    separator = text.IndexOf(": ", StringComparison.Ordinal);
+                    separatorLength = 2;
+                }
+
+                if (separator > 0 && separator + separatorLength < text.Length)
+                {
+                    var label = text[..separator].Trim(' ', ':', '-');
+                    var value = text[(separator + separatorLength)..].Trim();
+                    return new FindingRow(label, value);
+                }
+
+                return new FindingRow("", text);
+            })
+            .Where(row => !string.IsNullOrWhiteSpace(row.Value))
+            .ToList();
     }
 }
+
+<section class="diagnoses-page">
+    <div class="diagnoses-hero">
+        <div>
+            <span class="diagnoses-kicker">Shaxsiy kabinet</span>
+            <h2>Mening UZI tekshiruvlarim</h2>
+            <p>Tekshiruv natijalari tartibli ko'rinishda: sana, holat, shifokor, topilmalar va xulosa.</p>
+        </div>
+        <div class="diagnoses-count" aria-label="Jami tekshiruvlar soni">
+            <strong>@protocols.Count</strong>
+            <span>jami tekshiruv</span>
+        </div>
+    </div>
+
+    @if (!protocols.Any())
+    {
+        <div class="diagnoses-empty">
+            <div class="diagnoses-empty-icon">UZI</div>
+            <h3>Hozircha tekshiruvlar yo'q</h3>
+            <p>Shifokor tekshiruv natijasini yakunlagach, u shu sahifada ko'rinadi.</p>
+        </div>
+    }
+    else
+    {
+        <div class="diagnoses-list">
+            @foreach (var p in protocols)
+            {
+                var rows = BuildFindingRows(p.Findings);
+
+                <article class="diagnosis-card">
+                    <header class="diagnosis-card-header">
+                        <div class="diagnosis-title">
+                            <div class="diagnosis-icon">UZI</div>
+                            <div>
+                                <h3>@p.BodyPart</h3>
+                                <p>@p.ExamDate.ToString("dd.MM.yyyy") kuni o'tkazilgan tekshiruv</p>
+                            </div>
+                        </div>
+                        <div class="diagnosis-card-actions">
+                            <span class="diagnosis-status @GetStatusClass(p.Status)">@GetStatusText(p.Status)</span>
+                            <a href="/MyDiagnoses/ExportPdf/@p.Id" class="diagnosis-download-btn" title="PDF yuklab olish">
+                                PDF yuklab olish
+                            </a>
+                        </div>
+                    </header>
+
+                    <div class="diagnosis-info-grid">
+                        <div>
+                            <span>Tekshiruv sanasi</span>
+                            <strong>@p.ExamDate.ToString("dd.MM.yyyy")</strong>
+                        </div>
+                        <div>
+                            <span>Shifokor</span>
+                            <strong>@p.DoctorDisplayName</strong>
+                        </div>
+                        <div>
+                            <span>Holati</span>
+                            <strong>@GetStatusText(p.Status)</strong>
+                        </div>
+                    </div>
+
+                    <div class="diagnosis-section">
+                        <div class="diagnosis-section-title">
+                            <span>Topilmalar</span>
+                            <small>@rows.Count ta band</small>
+                        </div>
+
+                        @if (rows.Any())
+                        {
+                            <div class="diagnosis-findings-table">
+                                @foreach (var row in rows)
+                                {
+                                    <div class="finding-row">
+                                        @if (!string.IsNullOrWhiteSpace(row.Label))
+                                        {
+                                            <span>@row.Label</span>
+                                            <p>@row.Value</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="finding-row-full">@row.Value</p>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="diagnosis-muted">Topilmalar kiritilmagan.</p>
+                        }
+                    </div>
+
+                    <div class="diagnosis-conclusion">
+                        <span>Xulosa</span>
+                        <p>@(string.IsNullOrWhiteSpace(p.Conclusion) ? "Xulosa kiritilmagan." : p.Conclusion)</p>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

@@ -38,10 +38,10 @@ public class AppointmentService : IAppointmentService
 
     public async Task<IEnumerable<AppointmentDto>> GetTodayAsync()
     {
-        var today = DateTime.UtcNow.Date;
+        var today = DateTime.Today;
         var items = await _unitOfWork.Appointments.FindAsync(
             a => a.AppointmentDate.Date == today && !a.IsCancelled);
-        var orderedItems = items.OrderByDescending(a => a.CreatedAt).ToList();
+        var orderedItems = items.OrderBy(a => a.AppointmentDate).ToList();
         await AttachPatientsAsync(orderedItems);
         return _mapper.Map<IEnumerable<AppointmentDto>>(orderedItems);
     }

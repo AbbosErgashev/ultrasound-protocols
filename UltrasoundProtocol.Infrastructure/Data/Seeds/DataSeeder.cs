@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UltrasoundProtocol.Domain.Entities;
 using UltrasoundProtocol.Domain.Enums;
-using UltrasoundProtocol.Infrastructure.Security;
 
 namespace UltrasoundProtocol.Infrastructure.Data.Seeds;
 
@@ -16,7 +15,6 @@ public static class DataSeeder
         if (!await context.Users.AnyAsync())
         {
             Console.WriteLine("[DataSeeder] Boshlang'ich foydalanuvchilar yaratilmoqda...");
-            var hasher = new PasswordHasher();
 
             var patients = new List<User>
             {
@@ -29,7 +27,7 @@ public static class DataSeeder
                     Gender = "Erkak",
                     PhoneNumber = "+998901234567",
                     Email = "alisher@example.com",
-                    PasswordHash = hasher.Hash("Patient@123"),
+                    PasswordHash = "Patient@123",
                     Role = UserRole.User,
                     IsActive = true,
                     CreatedDate = DateTime.UtcNow,
@@ -44,7 +42,7 @@ public static class DataSeeder
                     Gender = "Ayol",
                     PhoneNumber = "+998907654321",
                     Email = "malika@example.com",
-                    PasswordHash = hasher.Hash("Patient@123"),
+                    PasswordHash = "Patient@123",
                     Role = UserRole.User,
                     IsActive = true,
                     CreatedDate = DateTime.UtcNow,
