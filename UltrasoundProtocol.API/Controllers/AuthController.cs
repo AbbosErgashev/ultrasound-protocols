@@ -71,11 +71,12 @@ public class AuthController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Logout()
     {
         var userName = User.Identity?.Name ?? "unknown";
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         _logger.LogInformation("Logout: {UserName}", userName);
-        return RedirectToAction("Login");
+        return RedirectToAction("Index", "Home");
     }
 }

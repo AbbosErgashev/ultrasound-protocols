@@ -20,7 +20,8 @@
         body { display: flex; min-height: 100vh; background: var(--app-bg); color: var(--app-text); overflow-x: hidden; }
         .sidebar { width: 260px; min-width: 260px; min-height: 100vh; background: var(--app-sidebar-bg); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; transition: width 0.18s ease, min-width 0.18s ease, transform 0.18s ease, opacity 0.14s ease; }
         .sidebar-brand, .sidebar nav { width: 260px; flex-shrink: 0; }
-        .sidebar-brand { padding: 1.2rem 1.5rem; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-brand { padding: 1.2rem 1.5rem; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; text-decoration: none; display: block; }
+        .sidebar-brand:hover, .sidebar-brand:focus-visible { color: #fff; background: rgba(255,255,255,0.08); }
         .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 0.6rem 1.5rem; border-radius: 0; transition: background 0.15s; display: flex; align-items: center; gap: 0.5rem; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); color: #fff; }
         .sidebar .nav-section { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); padding: 1rem 1.5rem 0.3rem; }
@@ -47,7 +48,7 @@
 @if (User.Identity?.IsAuthenticated == true)
 {
     <div class="sidebar">
-        <div class="sidebar-brand">🏥 MedUZI</div>
+        <a class="sidebar-brand" href="/Auth/Logout" title="Asosiy sahifaga chiqish">🏥 MedUZI</a>
         <nav class="nav flex-column pt-2">
             <a class="nav-link" href="/Dashboard">📊 Boshqaruv paneli</a>
 

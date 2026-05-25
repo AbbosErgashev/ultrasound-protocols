@@ -92,6 +92,18 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.Use(async (context, next) =>
+    {
+        if (context.User.Identity?.IsAuthenticated == true)
+        {
+            context.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+            context.Response.Headers.Pragma = "no-cache";
+            context.Response.Headers.Expires = "0";
+        }
+
+        await next();
+    });
+
     app.UseMiddleware<GlobalExceptionMiddleware>();
 
     app.MapControllerRoute(
