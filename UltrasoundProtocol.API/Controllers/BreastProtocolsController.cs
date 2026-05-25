@@ -11,6 +11,8 @@ namespace UltrasoundProtocol.API.Controllers;
 [Authorize(Roles = "Doctor,SeniorDoctor,ChiefDoctor")]
 public class BreastProtocolsController : Controller
 {
+    private const string MedicalInstitutionName = "MedUZI Diagnostika Markazi";
+
     private readonly IBreastProtocolService _breastProtocolService;
     private readonly IPatientService _patientService;
     private readonly IContentService _contentService;
@@ -32,6 +34,8 @@ public class BreastProtocolsController : Controller
         return View(new BreastProtocolCreateDto
         {
             ExamDate = DateTime.Today,
+            MedicalInstitutionName = MedicalInstitutionName,
+            MedicalInstitutionAddress = "Toshkent shahri, Chilonzor tumani, Bunyodkor shoh ko'chasi, 42-uy",
             Symmetry = "Simmetrik",
             Right = CreateDefaultSide(),
             Left = CreateDefaultSide()
@@ -42,6 +46,8 @@ public class BreastProtocolsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(BreastProtocolCreateDto dto, string? submitAction)
     {
+        dto.MedicalInstitutionName = MedicalInstitutionName;
+
         var doctors = (await _contentService.GetActiveDoctorsAsync()).ToList();
 
         if (dto.PatientId == Guid.Empty)
