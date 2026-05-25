@@ -23,15 +23,17 @@ public class AppointmentService : IAppointmentService
     {
         _logger.LogDebug("Barcha randevular so'raldi");
         var items = await _unitOfWork.Appointments.GetAllAsync();
-        await AttachPatientsAsync(items);
-        return _mapper.Map<IEnumerable<AppointmentDto>>(items);
+        var orderedItems = items.OrderByDescending(a => a.CreatedAt).ToList();
+        await AttachPatientsAsync(orderedItems);
+        return _mapper.Map<IEnumerable<AppointmentDto>>(orderedItems);
     }
 
     public async Task<IEnumerable<AppointmentDto>> GetByPatientIdAsync(Guid patientId)
     {
         var items = await _unitOfWork.Appointments.FindAsync(a => a.PatientId == patientId);
-        await AttachPatientsAsync(items);
-        return _mapper.Map<IEnumerable<AppointmentDto>>(items);
+        var orderedItems = items.OrderByDescending(a => a.CreatedAt).ToList();
+        await AttachPatientsAsync(orderedItems);
+        return _mapper.Map<IEnumerable<AppointmentDto>>(orderedItems);
     }
 
     public async Task<IEnumerable<AppointmentDto>> GetTodayAsync()
@@ -39,8 +41,9 @@ public class AppointmentService : IAppointmentService
         var today = DateTime.UtcNow.Date;
         var items = await _unitOfWork.Appointments.FindAsync(
             a => a.AppointmentDate.Date == today && !a.IsCancelled);
-        await AttachPatientsAsync(items);
-        return _mapper.Map<IEnumerable<AppointmentDto>>(items);
+        var orderedItems = items.OrderByDescending(a => a.CreatedAt).ToList();
+        await AttachPatientsAsync(orderedItems);
+        return _mapper.Map<IEnumerable<AppointmentDto>>(orderedItems);
     }
 
     public async Task<AppointmentDto> CreateAsync(AppointmentCreateDto dto)

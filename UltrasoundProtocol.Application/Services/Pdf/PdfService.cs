@@ -160,7 +160,7 @@ public class PdfService : IPdfService
             col.Item().Element(c => InfoRow(c, "Bemor:", ValueOrDefault(protocol.PatientName, "Kiritilmagan")));
             col.Item().Element(c => InfoRow(c, "Tekshirilgan organ:", protocol.BodyPart));
             col.Item().Element(c => InfoRow(c, "Tekshiruv sanasi:", protocol.ExamDate.ToString("dd.MM.yyyy")));
-            col.Item().Element(c => InfoRow(c, "Shifokor:", protocol.DoctorUsername));
+            col.Item().Element(c => InfoRow(c, "Shifokor:", protocol.DoctorDisplayName));
             col.Item().Element(c => InfoRow(c, "Holat:", TranslateStatus(protocol.Status)));
 
             col.Item().PaddingTop(10).Text("TOPILMALAR")
@@ -257,7 +257,7 @@ public class PdfService : IPdfService
             {
                 row.RelativeItem().Column(c =>
                 {
-                    c.Item().Text($"Shifokor: {ValueOrDefault(breastProtocol.DoctorName, protocol.DoctorUsername)}").FontSize(9);
+                    c.Item().Text($"Shifokor: {ValueOrDefault(breastProtocol.DoctorName, protocol.DoctorDisplayName)}").FontSize(9);
                     c.Item().PaddingTop(14).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                     c.Item().Text("Imzo").FontSize(8).FontColor(Colors.Grey.Darken1);
                 });
@@ -285,7 +285,7 @@ public class PdfService : IPdfService
 
             MetaCell(table, "Bemor", ValueOrDefault(protocol.PatientName, "Kiritilmagan"));
             MetaCell(table, "Tekshiruv sanasi", protocol.ExamDate.ToString("dd.MM.yyyy"));
-            MetaCell(table, "Shifokor", ValueOrDefault(breastProtocol.DoctorName, protocol.DoctorUsername));
+            MetaCell(table, "Shifokor", ValueOrDefault(breastProtocol.DoctorName, protocol.DoctorDisplayName));
             MetaCell(table, "Vazni", breastProtocol.PatientWeightKg.HasValue ? $"{breastProtocol.PatientWeightKg:0.##} kg" : "-");
             MetaCell(table, "Bo'yi", breastProtocol.PatientHeightCm.HasValue ? $"{breastProtocol.PatientHeightCm:0.##} sm" : "-");
             MetaCell(table, "Simmetrikligi", ValueOrDefault(breastProtocol.Symmetry, "-"));

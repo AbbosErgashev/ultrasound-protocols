@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using UltrasoundProtocol.Application.DTOs.BreastProtocol;
 using UltrasoundProtocol.Domain.Entities;
+using UltrasoundProtocol.Domain.Enums;
 using UltrasoundProtocol.Domain.Interfaces;
 
 namespace UltrasoundProtocol.Application.Services.BreastProtocol;
@@ -42,6 +43,7 @@ public class BreastProtocolService : IBreastProtocolService
             ExamDate = dto.ExamDate == default ? DateTime.Today : dto.ExamDate,
             Findings = findings,
             Conclusion = conclusion,
+            Status = ProtocolStatus.Active,
         };
 
         await _unitOfWork.UltrasoundExams.AddAsync(exam);

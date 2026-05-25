@@ -68,7 +68,11 @@ public class BreastProtocolsController : Controller
         var protocolId = await _breastProtocolService.CreateAsync(dto, doctorUsername);
 
         if (string.Equals(submitAction, "print", StringComparison.OrdinalIgnoreCase))
-            return RedirectToAction("ExportPdf", "Protocols", new { id = protocolId });
+        {
+            TempData["Success"] = "Sut bezining Ultratovush protokoli yaratildi. PDF yuklanmoqda.";
+            TempData["PendingPrintProtocolId"] = protocolId.ToString("D");
+            return RedirectToAction("Index", "Protocols");
+        }
 
         TempData["Success"] = "Sut bezining Ultratovush protokoli muvaffaqiyatli yaratildi";
         return RedirectToAction("Index", "Protocols");
