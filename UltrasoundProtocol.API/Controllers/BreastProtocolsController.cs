@@ -69,9 +69,8 @@ public class BreastProtocolsController : Controller
 
         if (string.Equals(submitAction, "print", StringComparison.OrdinalIgnoreCase))
         {
-            TempData["Success"] = "Sut bezining Ultratovush protokoli yaratildi. PDF yuklanmoqda.";
-            TempData["PendingPrintProtocolId"] = protocolId.ToString("D");
-            return RedirectToAction("Index", "Protocols");
+            TempData["Success"] = "Sut bezining Ultratovush protokoli yaratildi. Chop etishga tayyorlanmoqda.";
+            return RedirectToAction("Print", "Protocols", new { id = protocolId });
         }
 
         TempData["Success"] = "Sut bezining Ultratovush protokoli muvaffaqiyatli yaratildi";

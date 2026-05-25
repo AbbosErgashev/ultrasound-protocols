@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Protokolni chop etish";
+    Guid protocolId = ViewBag.ProtocolId;
+    string patientName = ViewBag.PatientName;
+    string bodyPart = ViewBag.BodyPart;
+    DateTime examDate = ViewBag.ExamDate;
+    var printPdfUrl = Url.Action("PrintPdf", "Protocols", new { id = protocolId });
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 print-toolbar">
+    <div>
+        <h3 class="mb-1">Protokolni chop etish</h3>
+        <div class="text-muted small">@patientName - @bodyPart - @examDate.ToString("dd.MM.yyyy")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-warning" data-print-protocol>Chop etish</button>
+        <a href="/Protocols" class="btn btn-outline-secondary">Protokollar ro'yxati</a>
+    </div>
+</div>
+
+<div class="alert alert-info py-2 print-toolbar">
+    PDF yuklangach chop etish oynasi avtomatik ochiladi. Ochilmasa, "Chop etish" tugmasini bosing.
+</div>
+
+<iframe
+    src="@printPdfUrl"
+    class="protocol-print-frame"
+    title="Protokol PDF"
+    data-print-frame>
+</iframe>
+
+@section Scripts {
+<style>
+    .protocol-print-frame {
+        width: 100%;
+        height: calc(100vh - 230px);
+        min-height: 620px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    @@media print {
+        .sidebar,
+        .topbar,
+        .print-toolbar {
+            display: none !important;
+        }
+
+        .main-content,
+        .page-body {
+            display: block !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .protocol-print-frame {
+            width: 100vw;
+            height: 100vh;
+            min-height: 0;
+            border: 0;
+            border-radius: 0;
+        }
+    }
+</style>
+<script>
+    (() => {
+        const frame = document.querySelector('[data-print-frame]');
+        const printButton = document.querySelector('[data-print-protocol]');
+        let hasAutoPrinted = false;
+
+        const printProtocol = () => {
+            if (!frame?.contentWindow) {
+                return;
+            }
+
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        };
+
+        frame?.addEventListener('load', () => {
+            if (hasAutoPrinted) {
+                return;
+            }
+
+            hasAutoPrinted = true;
+            window.setTimeout(printProtocol, 500);
+        });
+
+        printButton?.addEventListener('click', printProtocol);
+    })();
+</script>
+}
