@@ -15,16 +15,30 @@
             }
         })();
     </script>
-    <link rel="stylesheet" href="/app.css?v=20260525-1" />
+    <link rel="stylesheet" href="/app.css?v=20260525-2" />
     <style>
-        body { display: flex; min-height: 100vh; background: var(--app-bg); color: var(--app-text); }
-        .sidebar { width: 260px; min-height: 100vh; background: var(--app-sidebar-bg); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
+        body { display: flex; min-height: 100vh; background: var(--app-bg); color: var(--app-text); overflow-x: hidden; }
+        .sidebar { width: 260px; min-width: 260px; min-height: 100vh; background: var(--app-sidebar-bg); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; transition: width 0.18s ease, min-width 0.18s ease, transform 0.18s ease, opacity 0.14s ease; }
+        .sidebar-brand, .sidebar nav { width: 260px; flex-shrink: 0; }
         .sidebar-brand { padding: 1.2rem 1.5rem; font-size: 1.1rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 0.6rem 1.5rem; border-radius: 0; transition: background 0.15s; display: flex; align-items: center; gap: 0.5rem; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); color: #fff; }
         .sidebar .nav-section { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.45); padding: 1rem 1.5rem 0.3rem; }
+        body.sidebar-collapsed .sidebar { width: 0; min-width: 0; transform: translateX(-100%); opacity: 0; pointer-events: none; }
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .topbar { background: var(--app-surface); border-bottom: 1px solid var(--app-border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+        .topbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-toggle { width: 38px; height: 34px; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-surface); color: var(--app-text); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; }
+        .sidebar-toggle:hover { border-color: #38bdf8; box-shadow: 0 0 0 0.15rem rgba(56,189,248,0.16); }
+        .sidebar-toggle:focus-visible { outline: 2px solid var(--app-focus-ring); outline-offset: 2px; }
+        .sidebar-toggle-icon { width: 18px; height: 14px; position: relative; display: block; }
+        .sidebar-toggle-icon span { position: absolute; left: 0; width: 18px; height: 2px; border-radius: 999px; background: currentColor; transition: transform 0.18s ease, width 0.18s ease, left 0.18s ease; }
+        .sidebar-toggle-icon span:nth-child(1) { top: 0; }
+        .sidebar-toggle-icon span:nth-child(2) { top: 6px; }
+        .sidebar-toggle-icon span:nth-child(3) { top: 12px; }
+        body.sidebar-collapsed .sidebar-toggle-icon span:nth-child(1) { width: 10px; left: 7px; transform: translateY(2px) rotate(35deg); }
+        body.sidebar-collapsed .sidebar-toggle-icon span:nth-child(3) { width: 10px; left: 7px; transform: translateY(-2px) rotate(-35deg); }
         .page-body { flex: 1; padding: 1.5rem; overflow-y: auto; }
         .role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; }
     </style>
@@ -76,7 +90,16 @@
     </div>
     <div class="main-content">
         <div class="topbar">
-            <span class="fw-semibold text-muted">@ViewData["Title"]</span>
+            <div class="topbar-left">
+                <button type="button" class="sidebar-toggle" data-sidebar-toggle aria-label="Menyuni yashirish" title="Menyuni yashirish" aria-expanded="true">
+                    <span class="sidebar-toggle-icon" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+                <span class="fw-semibold text-muted topbar-title">@ViewData["Title"]</span>
+            </div>
             <div class="d-flex align-items-center gap-3">
                 @{
                     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
@@ -121,7 +144,7 @@ else
 }
 
 <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/site.js?v=20260525-1"></script>
+<script src="/site.js?v=20260525-2"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

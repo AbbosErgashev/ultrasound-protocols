@@ -4,6 +4,14 @@
     var patients = (IEnumerable<PatientDto>)ViewBag.Patients;
     var doctors = (IEnumerable<DoctorProfileDto>)ViewBag.Doctors;
 
+    string[] institutionAddressOptions =
+    [
+        "Toshkent shahri, Chilonzor tumani, Bunyodkor shoh ko'chasi, 42-uy",
+        "Toshkent shahri, Yunusobod tumani, Amir Temur shoh ko'chasi, 107B-uy",
+        "Toshkent viloyati, Piskent tumani, Piskent shahri, Mustaqillik ko'chasi, 15-uy",
+        "Samarqand shahri, Rudakiy ko'chasi, 138-uy",
+        "Farg'ona shahri, Al-Farg'oniy ko'chasi, 52-uy"
+    ];
     string[] machineOptions = ["Siemens", "Philips", "Mindray", "GE", "Canon", "Chison", "Hitachi", "Supersonic", "Esaote", "Clarius", "Sonoscape", "SIUI", "Boshqa variant"];
     string[] probeOptions = ["Chiziqli L 5-12 MGts", "Chiziqli L 4-9 MGts", "Boshqa variant"];
     string[] symmetryOptions = ["Simmetrik", "Asimmetrik", "O'ng qisman rezeksiya qilingan", "Chap qisman rezeksiya qilingan", "O'ng to'liq rezeksiya qilingan", "Chap to'liq rezeksiya qilingan", "O'ng rivojlanmagan", "Chap rivojlanmagan", "Boshqa variant"];
@@ -29,6 +37,15 @@
     string[] biradsOptions = ["1", "2", "3", "4A", "4B", "4C", "5", "6"];
 }
 
+@functions {
+    static IDictionary<string, object> OtherSelectAttrs(string? currentValue, string cssClass = "form-select") => new Dictionary<string, object>
+    {
+        ["class"] = cssClass,
+        ["data-other-select"] = "true",
+        ["data-current-value"] = currentValue ?? string.Empty
+    };
+}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h3 class="mb-1">Sut bezlari</h3>
@@ -47,15 +64,15 @@
             <div class="row g-3">
                 <div class="col-md-8">
                     <label class="form-label">Tibbiy muassasa nomi</label>
-                    <input asp-for="MedicalInstitutionName" class="form-control" placeholder="Tibbiy muassasa nomi" />
+                    <input asp-for="MedicalInstitutionName" class="form-control" readonly />
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">№ protokola</label>
-                    <input asp-for="ProtocolNumber" class="form-control" />
+                    <label class="form-label">Protokol raqami</label>
+                    <input asp-for="ProtocolNumber" class="form-control" placeholder="Protokol raqami" />
                 </div>
                 <div class="col-12">
                     <label class="form-label">Tibbiy muassasa manzili</label>
-                    <input asp-for="MedicalInstitutionAddress" class="form-control" />
+                    @Html.DropDownListFor(m => m.MedicalInstitutionAddress, new SelectList(institutionAddressOptions, Model.MedicalInstitutionAddress), "Tanlang", OtherSelectAttrs(Model.MedicalInstitutionAddress))
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Bemor</label>
@@ -86,14 +103,14 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">UZI apparati</label>
-                    @Html.DropDownListFor(m => m.UltrasoundMachine, new SelectList(machineOptions, Model.UltrasoundMachine), "Tanlang", new { @class = "form-select" })
+                    @Html.DropDownListFor(m => m.UltrasoundMachine, new SelectList(machineOptions, Model.UltrasoundMachine), "Tanlang", OtherSelectAttrs(Model.UltrasoundMachine))
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Datchik turi va chastotasi</label>
-                    @Html.DropDownListFor(m => m.Probe, new SelectList(probeOptions, Model.Probe), "Tanlang", new { @class = "form-select" })
+                    @Html.DropDownListFor(m => m.Probe, new SelectList(probeOptions, Model.Probe), "Tanlang", OtherSelectAttrs(Model.Probe))
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">UZI tekshiruvi №</label>
+                    <label class="form-label">UZI tekshiruvi raqami</label>
                     <input asp-for="UltrasoundExamNumber" class="form-control" />
                 </div>
                 <div class="col-md-4">
@@ -112,7 +129,7 @@
         <div class="card-header fw-semibold">2. Asosiy ma'lumotlar</div>
         <div class="card-body">
             <label class="form-label">Sut bezlari simmetrikligi</label>
-            @Html.DropDownListFor(m => m.Symmetry, new SelectList(symmetryOptions, Model.Symmetry), "Tanlang", new { @class = "form-select" })
+            @Html.DropDownListFor(m => m.Symmetry, new SelectList(symmetryOptions, Model.Symmetry), "Tanlang", OtherSelectAttrs(Model.Symmetry))
             <div class="form-text">(normada - simmetrik)</div>
         </div>
     </div>
@@ -124,22 +141,22 @@
                 <div class="card-body">
                     <div class="protocol-section">
                         <h6>Teri</h6>
-                        @Html.DropDownListFor(m => m.Right.SkinLine, new SelectList(skinOptions, Model.Right.SkinLine), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Right.SkinLine, new SelectList(skinOptions, Model.Right.SkinLine), "Tanlang", OtherSelectAttrs(Model.Right.SkinLine, "form-select mb-2"))
                         <input asp-for="Right.SkinThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
                     </div>
                     <div class="protocol-section">
                         <h6>Strukturasi</h6>
-                        @Html.DropDownListFor(m => m.Right.Structure, new SelectList(structureOptions, Model.Right.Structure), "Tanlang", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Right.Structure, new SelectList(structureOptions, Model.Right.Structure), "Tanlang", OtherSelectAttrs(Model.Right.Structure))
                     </div>
                     <div class="protocol-section">
                         <h6>So'rg'ich</h6>
-                        @Html.DropDownListFor(m => m.Right.Nipple, new SelectList(nippleOptions, Model.Right.Nipple), "Tanlang", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Right.Nipple, new SelectList(nippleOptions, Model.Right.Nipple), "Tanlang", OtherSelectAttrs(Model.Right.Nipple))
                         <div class="form-text">(norma - yumaloq, aniq chegaralangan)</div>
                     </div>
                     <div class="protocol-section">
                         <h6>So'rg'ich orqa zonasi</h6>
-                        @Html.DropDownListFor(m => m.Right.RetroareolarZone, new SelectList(visibilityOptions, Model.Right.RetroareolarZone), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Right.RetroareolarEchostructure, new SelectList(structureOptions, Model.Right.RetroareolarEchostructure), "Exostruktura", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Right.RetroareolarZone, new SelectList(visibilityOptions, Model.Right.RetroareolarZone), "Tanlang", OtherSelectAttrs(Model.Right.RetroareolarZone, "form-select mb-2"))
+                        @Html.DropDownListFor(m => m.Right.RetroareolarEchostructure, new SelectList(structureOptions, Model.Right.RetroareolarEchostructure), "Exostruktura", OtherSelectAttrs(Model.Right.RetroareolarEchostructure))
                     </div>
                     <div class="protocol-section">
                         <h6>To'qimani farqlash</h6>
@@ -148,7 +165,7 @@
                     <div class="protocol-section">
                         <h6>Teri osti yog' to'qimasi</h6>
                         @Html.DropDownListFor(m => m.Right.SubcutaneousFat, new SelectList(fatOptions, Model.Right.SubcutaneousFat), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Right.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Right.SubcutaneousFatEchostructure), "Exostruktura", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Right.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Right.SubcutaneousFatEchostructure), "Exostruktura", OtherSelectAttrs(Model.Right.SubcutaneousFatEchostructure))
                     </div>
                     <div class="protocol-section">
                         <h6>Fibroglandulyar kompleks</h6>
@@ -173,8 +190,8 @@
                     <div class="protocol-section">
                         <h6>Sut yo'llari</h6>
                         @Html.DropDownListFor(m => m.Right.Ducts, new SelectList(ductsOptions, Model.Right.Ducts), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Right.DuctWall, new SelectList(ductWallOptions, Model.Right.DuctWall), "Sut yo'llari devori", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Right.DuctContent, new SelectList(ductContentOptions, Model.Right.DuctContent), "Sut yo'llari tarkibi", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Right.DuctWall, new SelectList(ductWallOptions, Model.Right.DuctWall), "Sut yo'llari devori", OtherSelectAttrs(Model.Right.DuctWall, "form-select mb-2"))
+                        @Html.DropDownListFor(m => m.Right.DuctContent, new SelectList(ductContentOptions, Model.Right.DuctContent), "Sut yo'llari tarkibi", OtherSelectAttrs(Model.Right.DuctContent))
                     </div>
                     <div class="protocol-section">
                         <h6>Retromammar yog' qatlami</h6>
@@ -194,22 +211,22 @@
                 <div class="card-body">
                     <div class="protocol-section">
                         <h6>Teri</h6>
-                        @Html.DropDownListFor(m => m.Left.SkinLine, new SelectList(skinOptions, Model.Left.SkinLine), "Tanlang", new { @class = "form-select mb-2" })
+                        @Html.DropDownListFor(m => m.Left.SkinLine, new SelectList(skinOptions, Model.Left.SkinLine), "Tanlang", OtherSelectAttrs(Model.Left.SkinLine, "form-select mb-2"))
                         <input asp-for="Left.SkinThicknessMm" type="number" step="0.1" class="form-control" placeholder="Qalinligi (mm)" />
                     </div>
                     <div class="protocol-section">
                         <h6>Strukturasi</h6>
-                        @Html.DropDownListFor(m => m.Left.Structure, new SelectList(structureOptions, Model.Left.Structure), "Tanlang", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Left.Structure, new SelectList(structureOptions, Model.Left.Structure), "Tanlang", OtherSelectAttrs(Model.Left.Structure))
                     </div>
                     <div class="protocol-section">
                         <h6>So'rg'ich</h6>
-                        @Html.DropDownListFor(m => m.Left.Nipple, new SelectList(nippleOptions, Model.Left.Nipple), "Tanlang", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Left.Nipple, new SelectList(nippleOptions, Model.Left.Nipple), "Tanlang", OtherSelectAttrs(Model.Left.Nipple))
                         <div class="form-text">(norma - yumaloq, aniq chegaralangan)</div>
                     </div>
                     <div class="protocol-section">
                         <h6>So'rg'ich orqa zonasi</h6>
-                        @Html.DropDownListFor(m => m.Left.RetroareolarZone, new SelectList(visibilityOptions, Model.Left.RetroareolarZone), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Left.RetroareolarEchostructure, new SelectList(structureOptions, Model.Left.RetroareolarEchostructure), "Exostruktura", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Left.RetroareolarZone, new SelectList(visibilityOptions, Model.Left.RetroareolarZone), "Tanlang", OtherSelectAttrs(Model.Left.RetroareolarZone, "form-select mb-2"))
+                        @Html.DropDownListFor(m => m.Left.RetroareolarEchostructure, new SelectList(structureOptions, Model.Left.RetroareolarEchostructure), "Exostruktura", OtherSelectAttrs(Model.Left.RetroareolarEchostructure))
                     </div>
                     <div class="protocol-section">
                         <h6>To'qimani farqlash</h6>
@@ -218,7 +235,7 @@
                     <div class="protocol-section">
                         <h6>Teri osti yog' to'qimasi</h6>
                         @Html.DropDownListFor(m => m.Left.SubcutaneousFat, new SelectList(fatOptions, Model.Left.SubcutaneousFat), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Left.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Left.SubcutaneousFatEchostructure), "Exostruktura", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Left.SubcutaneousFatEchostructure, new SelectList(structureOptions, Model.Left.SubcutaneousFatEchostructure), "Exostruktura", OtherSelectAttrs(Model.Left.SubcutaneousFatEchostructure))
                     </div>
                     <div class="protocol-section">
                         <h6>Fibroglandulyar kompleks</h6>
@@ -243,8 +260,8 @@
                     <div class="protocol-section">
                         <h6>Sut yo'llari</h6>
                         @Html.DropDownListFor(m => m.Left.Ducts, new SelectList(ductsOptions, Model.Left.Ducts), "Tanlang", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Left.DuctWall, new SelectList(ductWallOptions, Model.Left.DuctWall), "Sut yo'llari devori", new { @class = "form-select mb-2" })
-                        @Html.DropDownListFor(m => m.Left.DuctContent, new SelectList(ductContentOptions, Model.Left.DuctContent), "Sut yo'llari tarkibi", new { @class = "form-select" })
+                        @Html.DropDownListFor(m => m.Left.DuctWall, new SelectList(ductWallOptions, Model.Left.DuctWall), "Sut yo'llari devori", OtherSelectAttrs(Model.Left.DuctWall, "form-select mb-2"))
+                        @Html.DropDownListFor(m => m.Left.DuctContent, new SelectList(ductContentOptions, Model.Left.DuctContent), "Sut yo'llari tarkibi", OtherSelectAttrs(Model.Left.DuctContent))
                     </div>
                     <div class="protocol-section">
                         <h6>Retromammar yog' qatlami</h6>
@@ -273,7 +290,7 @@
                 <div class="col-md-3"><input asp-for="Lesion.Shape" class="form-control" placeholder="Shakli, masalan oval" /></div>
                 <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Orientation, new SelectList(orientationOptions, Model.Lesion.Orientation), "Joylashuv yo'nalishi", new { @class = "form-select" })</div>
                 <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Contours, new SelectList(contourOptions, Model.Lesion.Contours), "Konturlari", new { @class = "form-select" })</div>
-                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Structure, new SelectList(structureOptions, Model.Lesion.Structure), "Tuzilmasi", new { @class = "form-select" })</div>
+                <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Structure, new SelectList(structureOptions, Model.Lesion.Structure), "Tuzilmasi", OtherSelectAttrs(Model.Lesion.Structure))</div>
                 <div class="col-md-3">@Html.DropDownListFor(m => m.Lesion.Echogenicity, new SelectList(echogenicityOptions, Model.Lesion.Echogenicity), "Exogenligi", new { @class = "form-select" })</div>
                 <div class="col-md-4">@Html.DropDownListFor(m => m.Lesion.DistalAcousticEffect, new SelectList(distalOptions, Model.Lesion.DistalAcousticEffect), "Distal akustik ta'siri", new { @class = "form-select" })</div>
                 <div class="col-md-4">@Html.DropDownListFor(m => m.Lesion.Calcifications, new SelectList(calcificationOptions, Model.Lesion.Calcifications), "Kalsinatlar", new { @class = "form-select" })</div>
@@ -323,7 +340,7 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label">Qo'shimcha ma'lumotlar</label>
-                <textarea asp-for="AdditionalInfo" rows="3" class="form-control"></textarea>
+                <textarea asp-for="AdditionalInfo" rows="3" class="form-control" placeholder="Bo'sh qoldirilsa hech narsa yozilmaydi (ixtiyoriy)"></textarea>
             </div>
             <div class="row g-3">
                 <div class="col-md-9">
@@ -382,5 +399,74 @@
     .form-check {
         margin-bottom: 0.45rem;
     }
+
+    .other-variant-field {
+        margin-top: 0.5rem;
+    }
 </style>
+<script>
+    (() => {
+        const otherLabel = 'Boshqa variant';
+        const form = document.querySelector('.breast-protocol-form');
+
+        if (!form) {
+            return;
+        }
+
+        const hasOtherOption = (select) =>
+            Array.from(select.options).some(option => option.value === otherLabel || option.text.trim() === otherLabel);
+
+        const getOptionValues = (select) =>
+            Array.from(select.options).map(option => option.value);
+
+        const setupOtherField = (select) => {
+            if (!hasOtherOption(select)) {
+                return;
+            }
+
+            const originalName = select.name;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'other-variant-field d-none';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'form-control form-control-sm';
+            input.placeholder = 'Boshqa variantni kiriting';
+            input.autocomplete = 'off';
+            input.disabled = true;
+
+            wrapper.appendChild(input);
+            select.insertAdjacentElement('afterend', wrapper);
+            select.dataset.originalName = originalName;
+
+            const currentValue = (select.dataset.currentValue || '').trim();
+            if (currentValue && !getOptionValues(select).includes(currentValue)) {
+                select.value = otherLabel;
+                input.value = currentValue;
+            }
+
+            const updateState = () => {
+                const isOtherSelected = select.value === otherLabel;
+                wrapper.classList.toggle('d-none', !isOtherSelected);
+                input.disabled = !isOtherSelected;
+                input.required = isOtherSelected;
+
+                if (isOtherSelected) {
+                    select.removeAttribute('name');
+                    input.name = originalName;
+                    return;
+                }
+
+                select.name = originalName;
+                input.removeAttribute('name');
+                input.value = '';
+            };
+
+            select.addEventListener('change', updateState);
+            updateState();
+        };
+
+        form.querySelectorAll('select').forEach(setupOtherField);
+    })();
+</script>
 }

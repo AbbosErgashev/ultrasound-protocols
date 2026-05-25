@@ -10,6 +10,7 @@ namespace UltrasoundProtocol.Application.Services.BreastProtocol;
 
 public class BreastProtocolService : IBreastProtocolService
 {
+    private const string MedicalInstitutionName = "MedUZI Diagnostika Markazi";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly IUnitOfWork _unitOfWork;
@@ -51,7 +52,7 @@ public class BreastProtocolService : IBreastProtocolService
             PatientId = dto.PatientId,
             DoctorUsername = doctorUsername,
             DoctorName = Clean(doctor.FullName),
-            MedicalInstitutionName = Clean(dto.MedicalInstitutionName),
+            MedicalInstitutionName = MedicalInstitutionName,
             MedicalInstitutionAddress = Clean(dto.MedicalInstitutionAddress),
             ProtocolNumber = Clean(dto.ProtocolNumber),
             ExamDate = exam.ExamDate,

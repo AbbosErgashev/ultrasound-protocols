@@ -31,6 +31,32 @@ function setStoredTheme(theme) {
     }
 }
 
+function getStoredSidebarState() {
+    try {
+        return localStorage.getItem('meduzi-sidebar-collapsed') === 'true';
+    } catch (_) {
+        return false;
+    }
+}
+
+function setStoredSidebarState(isCollapsed) {
+    try {
+        localStorage.setItem('meduzi-sidebar-collapsed', String(isCollapsed));
+    } catch (_) {
+        // Sidebar still toggles for this page even when storage is unavailable.
+    }
+}
+
+function applySidebarState(isCollapsed) {
+    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+
+    document.querySelectorAll('[data-sidebar-toggle]').forEach(toggle => {
+        toggle.setAttribute('aria-expanded', String(!isCollapsed));
+        toggle.setAttribute('aria-label', isCollapsed ? 'Menyuni chiqarish' : 'Menyuni yashirish');
+        toggle.setAttribute('title', isCollapsed ? 'Menyuni chiqarish' : 'Menyuni yashirish');
+    });
+}
+
 applyTheme(getStoredTheme());
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -43,6 +69,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             setStoredTheme(nextTheme);
             applyTheme(nextTheme);
+        });
+    });
+
+    // ===== SIDEBAR TOGGLE =====
+    applySidebarState(getStoredSidebarState());
+
+    document.querySelectorAll('[data-sidebar-toggle]').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const isCollapsed = !document.body.classList.contains('sidebar-collapsed');
+            setStoredSidebarState(isCollapsed);
+            applySidebarState(isCollapsed);
         });
     });
 
