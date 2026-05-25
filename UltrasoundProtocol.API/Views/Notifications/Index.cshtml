@@ -1,0 +1,71 @@
+@model IEnumerable<NotificationDto>
+@{
+    ViewData["Title"] = "Xabarlar";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+@functions {
+    static string TypeText(NotificationType type) => type switch
+    {
+        NotificationType.Email => "Email",
+        NotificationType.SMS => "SMS",
+        NotificationType.InApp => "Tizim",
+        _ => type.ToString()
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Xabarlar</h3>
+    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">Boshqaruv paneliga qaytish</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Xabarlar topilmadi.</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Sarlavha</th>
+                        <th>Xabar</th>
+                        <th>Turi</th>
+                        <th>Vaqti</th>
+                        <th>Holat</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var notification in Model)
+                    {
+                        <tr class="@(notification.IsRead ? "" : "table-warning")">
+                            <td><strong>@notification.Title</strong></td>
+                            <td>@notification.Message</td>
+                            <td>@TypeText(notification.Type)</td>
+                            <td>@notification.SentAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge @(notification.IsRead ? "bg-secondary" : "bg-danger")">
+                                    @(notification.IsRead ? "O'qilgan" : "Yangi")
+                                </span>
+                            </td>
+                            <td>
+                                @if (!notification.IsRead)
+                                {
+                                    <form method="post" asp-controller="Notifications" asp-action="MarkAsRead"
+                                          asp-route-id="@notification.Id" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">O'qildi</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

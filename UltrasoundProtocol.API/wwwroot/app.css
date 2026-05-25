@@ -1197,3 +1197,460 @@ html[data-theme="dark"] .protocol-section h6 {
         margin-bottom: 0.5rem;
     }
 }
+
+/* ===== USER PROFILE AND DIAGNOSES ===== */
+.diagnoses-page,
+.profile-page {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.diagnoses-hero,
+.profile-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.diagnoses-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.diagnoses-kicker,
+.profile-kicker {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+    color: #0284c7;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.diagnoses-hero h2,
+.profile-header h2 {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 1.45rem;
+    font-weight: 750;
+    letter-spacing: 0;
+}
+
+.diagnoses-hero p,
+.profile-header p {
+    max-width: 660px;
+    margin: 0.35rem 0 0;
+    color: var(--app-muted);
+}
+
+.diagnoses-count {
+    min-width: 128px;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(14, 165, 233, 0.22);
+    border-radius: 8px;
+    background: rgba(14, 165, 233, 0.08);
+    text-align: center;
+}
+
+.diagnoses-count strong {
+    display: block;
+    color: #0284c7;
+    font-size: 1.7rem;
+    line-height: 1;
+}
+
+.diagnoses-count span {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--app-muted);
+    font-size: 0.82rem;
+}
+
+.diagnoses-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.diagnosis-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.diagnosis-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.15rem;
+    background: var(--app-surface-2);
+    border-bottom: 1px solid var(--app-border);
+}
+
+.diagnosis-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+}
+
+.diagnosis-icon,
+.diagnoses-empty-icon,
+.profile-avatar {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+    color: #075985;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.diagnosis-title h3 {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 1.08rem;
+    font-weight: 750;
+}
+
+.diagnosis-title p {
+    margin: 0.18rem 0 0;
+    color: var(--app-muted);
+    font-size: 0.9rem;
+}
+
+.diagnosis-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.diagnosis-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.diagnosis-download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    border-radius: 8px;
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626 !important;
+    font-size: 0.84rem;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.diagnosis-download-btn:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff !important;
+}
+
+.status-draft {
+    background: rgba(100, 116, 139, 0.14);
+    color: #64748b;
+}
+
+.status-active {
+    background: rgba(37, 99, 235, 0.13);
+    color: #2563eb;
+}
+
+.status-completed {
+    background: rgba(22, 163, 74, 0.14);
+    color: #15803d;
+}
+
+.status-archived {
+    background: rgba(15, 23, 42, 0.14);
+    color: var(--app-text);
+}
+
+.diagnosis-info-grid,
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 1rem 1.15rem;
+}
+
+.diagnosis-info-grid > div,
+.profile-info-row {
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: var(--app-surface);
+}
+
+.diagnosis-info-grid span,
+.profile-info-row span {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--app-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.diagnosis-info-grid strong,
+.profile-info-row strong {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--app-text);
+    font-weight: 750;
+}
+
+.diagnosis-section {
+    padding: 0 1.15rem 1rem;
+}
+
+.diagnosis-section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.65rem;
+}
+
+.diagnosis-section-title span {
+    color: var(--app-text);
+    font-weight: 800;
+}
+
+.diagnosis-section-title small {
+    color: var(--app-muted);
+}
+
+.diagnosis-findings-table {
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.finding-row {
+    display: grid;
+    grid-template-columns: minmax(160px, 260px) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.75rem 0.85rem;
+    background: var(--app-surface);
+}
+
+.finding-row + .finding-row {
+    border-top: 1px solid var(--app-border);
+}
+
+.finding-row:nth-child(even) {
+    background: var(--app-surface-2);
+}
+
+.finding-row span {
+    color: var(--app-muted);
+    font-size: 0.9rem;
+    font-weight: 750;
+}
+
+.finding-row p {
+    margin: 0;
+    color: var(--app-text);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.finding-row-full {
+    grid-column: 1 / -1;
+}
+
+.diagnosis-muted {
+    margin: 0;
+    color: var(--app-muted);
+}
+
+.diagnosis-conclusion {
+    margin: 0 1.15rem 1.15rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(14, 165, 233, 0.22);
+    border-left: 4px solid #0ea5e9;
+    border-radius: 8px;
+    background: rgba(14, 165, 233, 0.08);
+}
+
+.diagnosis-conclusion span {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #0284c7;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.diagnosis-conclusion p {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 1rem;
+    font-weight: 650;
+    line-height: 1.6;
+}
+
+.diagnoses-empty {
+    padding: 3rem 1.25rem;
+    border: 1px dashed var(--app-border);
+    border-radius: 8px;
+    background: var(--app-surface);
+    text-align: center;
+}
+
+.diagnoses-empty-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 1rem;
+}
+
+.diagnoses-empty h3 {
+    margin: 0;
+    color: var(--app-text);
+    font-size: 1.2rem;
+}
+
+.diagnoses-empty p {
+    margin: 0.45rem auto 0;
+    max-width: 420px;
+    color: var(--app-muted);
+}
+
+.profile-page {
+    max-width: 760px;
+}
+
+.profile-card {
+    padding: 1.25rem;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #d1fae5, #dbeafe);
+    color: #047857;
+    font-size: 1.45rem;
+}
+
+.profile-info-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1rem 0 0;
+}
+
+.profile-actions {
+    padding-top: 0.25rem;
+}
+
+html[data-theme="dark"] .diagnoses-hero,
+html[data-theme="dark"] .diagnosis-card,
+html[data-theme="dark"] .profile-card {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] .diagnosis-icon,
+html[data-theme="dark"] .diagnoses-empty-icon {
+    background: #132238;
+    color: #7dd3fc;
+}
+
+html[data-theme="dark"] .profile-avatar {
+    background: #132a2a;
+    color: #86efac;
+}
+
+html[data-theme="dark"] .status-draft {
+    color: #cbd5e1;
+}
+
+html[data-theme="dark"] .status-active {
+    color: #93c5fd;
+}
+
+    html[data-theme="dark"] .status-completed {
+    color: #86efac;
+}
+
+html[data-theme="dark"] .diagnosis-download-btn {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.32);
+    color: #fca5a5 !important;
+}
+
+html[data-theme="dark"] .diagnosis-download-btn:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+    .diagnoses-hero,
+    .diagnosis-card-header,
+    .profile-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .diagnoses-count {
+        width: 100%;
+    }
+
+    .diagnosis-status {
+        align-self: flex-start;
+    }
+
+    .diagnosis-card-actions {
+        justify-content: flex-start;
+    }
+
+    .diagnosis-info-grid,
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .finding-row {
+        grid-template-columns: 1fr;
+        gap: 0.3rem;
+    }
+}

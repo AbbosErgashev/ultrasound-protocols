@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using UltrasoundProtocol.Domain.Interfaces;
 using UltrasoundProtocol.Infrastructure.Data;
 using UltrasoundProtocol.Infrastructure.Repositories;
-using UltrasoundProtocol.Infrastructure.Security;
 
 namespace UltrasoundProtocol.Infrastructure;
 
@@ -18,7 +17,6 @@ public static class InfrastructureServiceExtensions
             options.UseNpgsql(configuration.GetConnectionString("PostgreSQL")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<PasswordHasher>();
 
         return services;
     }

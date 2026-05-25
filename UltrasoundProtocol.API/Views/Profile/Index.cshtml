@@ -1,27 +1,48 @@
 @{
     ViewData["Title"] = "Mening profilim";
     var userId = User.FindFirst("UserId")?.Value;
+    var fullNameValue = ViewBag.FullName as string;
+    var usernameValue = ViewBag.Username as string;
+    var roleValue = ViewBag.Role as string;
+    var fullName = string.IsNullOrWhiteSpace(fullNameValue) ? "Kiritilmagan" : fullNameValue;
+    var username = string.IsNullOrWhiteSpace(usernameValue) ? "Kiritilmagan" : usernameValue;
+    var role = string.IsNullOrWhiteSpace(roleValue) ? "User" : roleValue;
 }
 
-<h3 class="mb-4">👤 Mening profilim</h3>
-
-<div class="card" style="max-width:500px;">
-    <div class="card-body">
-        <div class="text-center mb-4">
-            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto;">
-                👤
+<section class="profile-page">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                @username.ToString().Substring(0, 1).ToUpperInvariant()
+            </div>
+            <div>
+                <span class="profile-kicker">Shaxsiy ma'lumotlar</span>
+                <h2>@fullName</h2>
+                <p>@username</p>
             </div>
         </div>
-        <table class="table table-borderless">
-            <tr><td class="fw-bold" style="width:40%">Lavozim:</td><td>@ViewBag.FullName</td></tr>
-            <tr><td class="fw-bold">Login:</td><td>@ViewBag.Username</td></tr>
-            @* <tr><td class="fw-bold">Claim:</td><td><span class="badge bg-primary">@ViewBag.Role</span></td></tr> *@
-            @* <tr>
-                <td class="fw-bold">User ID:</td>
-                <td>@(string.IsNullOrEmpty(userId) ? "Statik foydalanuvchi" : userId)</td>
-            </tr> *@
-        </table>
-        <hr />
-        <a href="/Auth/Logout" class="btn btn-outline-danger w-100">🚪 Tizimdan chiqish</a>
+
+        <div class="profile-info-grid">
+            <div class="profile-info-row">
+                <span>F.I.Sh</span>
+                <strong>@fullName</strong>
+            </div>
+            <div class="profile-info-row">
+                <span>Login</span>
+                <strong>@username</strong>
+            </div>
+            <div class="profile-info-row">
+                <span>Rol</span>
+                <strong>@role</strong>
+            </div>
+            <div class="profile-info-row">
+                <span>Foydalanuvchi ID</span>
+                <strong>@(string.IsNullOrEmpty(userId) ? "Statik foydalanuvchi" : userId)</strong>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="/Auth/Logout" class="btn btn-outline-danger w-100">Tizimdan chiqish</a>
+        </div>
     </div>
-</div>
+</section>

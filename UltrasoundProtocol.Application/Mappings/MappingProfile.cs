@@ -28,7 +28,9 @@ public class MappingProfile : Profile
         CreateMap<ReportCreateDto, Report>();
 
         CreateMap<Appointment, AppointmentDto>()
-            .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient == null ? string.Empty : s.Patient.FullName));
+            .ForMember(d => d.PatientName, o => o.MapFrom(s => s.Patient == null ? string.Empty : s.Patient.FullName))
+            .ForMember(d => d.PatientPhoneNumber, o => o.MapFrom(s => s.Patient == null ? string.Empty : s.Patient.PhoneNumber))
+            .ForMember(d => d.PatientEmail, o => o.MapFrom(s => s.Patient == null ? null : s.Patient.Email));
         CreateMap<AppointmentCreateDto, Appointment>();
 
         CreateMap<Notification, NotificationDto>();

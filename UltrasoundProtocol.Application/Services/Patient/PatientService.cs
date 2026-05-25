@@ -4,7 +4,6 @@ using UltrasoundProtocol.Application.DTOs.Patient;
 using UltrasoundProtocol.Domain.Entities;
 using UltrasoundProtocol.Domain.Enums;
 using UltrasoundProtocol.Domain.Interfaces;
-using UltrasoundProtocol.Infrastructure.Security;
 
 namespace UltrasoundProtocol.Application.Services.Patient;
 
@@ -12,15 +11,12 @@ public class PatientService : IPatientService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly PasswordHasher _passwordHasher;
     private readonly ILogger<PatientService> _logger;
 
-    public PatientService(IUnitOfWork unitOfWork, IMapper mapper, PasswordHasher passwordHasher,
-        ILogger<PatientService> logger)
+    public PatientService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<PatientService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _passwordHasher = passwordHasher;
         _logger = logger;
     }
 
@@ -53,7 +49,7 @@ public class PatientService : IPatientService
 
         var user = _mapper.Map<User>(dto);
         user.Username = dto.Username;
-        user.PasswordHash = _passwordHasher.Hash(dto.Password);
+        user.PasswordHash = dto.Password;
         user.Role = UserRole.User;
         user.IsActive = true;
         user.CreatedDate = DateTime.UtcNow;
@@ -106,7 +102,7 @@ public class PatientService : IPatientService
             user.Username = newUsername;
 
         if (!string.IsNullOrEmpty(newPassword))
-            user.PasswordHash = _passwordHasher.Hash(newPassword);
+            user.PasswordHash = newPassword;
 
         user.UpdatedAt = DateTime.UtcNow;
         _unitOfWork.Users.Update(user);

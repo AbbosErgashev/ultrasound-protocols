@@ -34,6 +34,13 @@ public class AppointmentsController : Controller
         return View(appointments);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Today()
+    {
+        var appointments = await _appointmentService.GetTodayAsync();
+        return View(appointments);
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(AppointmentCreateDto dto)
@@ -66,19 +73,27 @@ public class AppointmentsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Confirm(Guid id)
+    public async Task<IActionResult> Confirm(Guid id, string? returnUrl)
     {
         await _appointmentService.ConfirmAsync(id);
         TempData["Success"] = "Randevu tasdiqlandi";
-        return RedirectToAction("Index");
+        return RedirectToLocalOrIndex(returnUrl);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Cancel(Guid id)
+    public async Task<IActionResult> Cancel(Guid id, string? returnUrl)
     {
         await _appointmentService.CancelAsync(id);
         TempData["Success"] = "Randevu bekor qilindi";
-        return RedirectToAction("Index");
+        return RedirectToLocalOrIndex(returnUrl);
+    }
+
+    private IActionResult RedirectToLocalOrIndex(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return LocalRedirect(returnUrl);
+
+        return RedirectToAction(nameof(Index));
     }
 }
