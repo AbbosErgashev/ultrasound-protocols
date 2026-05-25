@@ -42,12 +42,6 @@ public class ProtocolsController : Controller
 
         ViewBag.Search = search;
         ViewBag.Status = status;
-        ViewBag.PendingPrintProtocolId =
-            TempData["PendingPrintProtocolId"] is string pendingPrintProtocolId &&
-            Guid.TryParse(pendingPrintProtocolId, out _)
-                ? pendingPrintProtocolId
-                : null;
-
         return View(protocols);
     }
 
@@ -82,15 +76,36 @@ public class ProtocolsController : Controller
         var protocol = await _protocolService.GetByIdAsync(id);
         if (protocol is null) return NotFound();
 
-        var breastProtocol = IsBreastProtocol(protocol.BodyPart)
-            ? await _breastProtocolService.GetPdfDataByExamIdAsync(id)
-            : null;
-
-        var pdf = breastProtocol is null
-            ? _pdfService.GenerateProtocolPdf(protocol)
-            : _pdfService.GenerateBreastProtocolPdf(protocol, breastProtocol);
+        var pdf = await GeneratePdfAsync(id, protocol.BodyPart, protocol);
 
         return File(pdf, "application/pdf", $"UZI_Protokol_{protocol.BodyPart}_{protocol.ExamDate:yyyyMMdd}.pdf");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Print(Guid id)
+    {
+        var protocol = await _protocolService.GetByIdAsync(id);
+        if (protocol is null) return NotFound();
+
+        ViewBag.ProtocolId = id;
+        ViewBag.PatientName = protocol.PatientName;
+        ViewBag.BodyPart = protocol.BodyPart;
+        ViewBag.ExamDate = protocol.ExamDate;
+
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PrintPdf(Guid id)
+    {
+        var protocol = await _protocolService.GetByIdAsync(id);
+        if (protocol is null) return NotFound();
+
+        var pdf = await GeneratePdfAsync(id, protocol.BodyPart, protocol);
+        Response.Headers.ContentDisposition =
+            $"inline; filename=\"UZI_Protokol_{protocol.BodyPart}_{protocol.ExamDate:yyyyMMdd}.pdf\"";
+
+        return File(pdf, "application/pdf");
     }
 
     [HttpGet]
@@ -103,4 +118,15 @@ public class ProtocolsController : Controller
 
     private static bool IsBreastProtocol(string bodyPart) =>
         bodyPart.Contains("Sut bez", StringComparison.OrdinalIgnoreCase);
+
+    private async Task<byte[]> GeneratePdfAsync(Guid id, string bodyPart, Application.DTOs.Protocol.ProtocolDto protocol)
+    {
+        var breastProtocol = IsBreastProtocol(bodyPart)
+            ? await _breastProtocolService.GetPdfDataByExamIdAsync(id)
+            : null;
+
+        return breastProtocol is null
+            ? _pdfService.GenerateProtocolPdf(protocol)
+            : _pdfService.GenerateBreastProtocolPdf(protocol, breastProtocol);
+    }
 }

@@ -3,7 +3,6 @@
     ViewData["Title"] = "UZI Protokollar";
     string? search = ViewBag.Search;
     string? status = ViewBag.Status;
-    string? pendingPrintProtocolId = ViewBag.PendingPrintProtocolId;
 }
 
 @functions {
@@ -129,16 +128,3 @@ else
     </div>
 }
 
-@section Scripts {
-    @if (!string.IsNullOrWhiteSpace(pendingPrintProtocolId))
-    {
-        <script>
-            (() => {
-                const downloadUrl = '@Url.Action("ExportPdf", "Protocols", new { id = pendingPrintProtocolId })';
-                window.setTimeout(() => {
-                    window.location.assign(downloadUrl);
-                }, 300);
-            })();
-        </script>
-    }
-}
